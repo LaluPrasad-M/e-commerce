@@ -1,7 +1,7 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-const { JWT_KEY } = require("../../resources/jwtConfig");
+const { JWT_KEY } = require("../../config/authenticationConfig");
 
 exports.hash = async (password) => {
   const salt = 10;
@@ -33,7 +33,8 @@ exports.generateSessionToken = async (
 
 exports.checkAuth = (req, res, next) => {
   try {
-    const token = req.query.Token;
+    const token = req.query.token || req.body.token || req.flash('token')[0] || req.headers["x-access-token"];
+    req.flash('token',token);
     const decoded = jwt.verify(token, JWT_KEY);
     req.userData = decoded;
     next();

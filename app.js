@@ -1,13 +1,19 @@
-const express = require("express");
-const bodyparser = require("body-parser");
+"use strict";
 
-const users = require("./api/routes/users");
-const orders = require("./api/routes/orders");
-const roles = require("./api/routes/roles");
-const categories = require("./api/routes/categories");
-const tags = require("./api/routes/tags");
-const products = require("./api/routes/products");
-const carts = require("./api/routes/carts");
+const express = require("express");
+const session = require("express-session");
+const flash = require("connect-flash");
+const compression = require("compression");
+
+// const bodyParser = require("body-parser");
+
+const users = require("./app/routes/users");
+const orders = require("./app/routes/orders");
+const roles = require("./app/routes/roles");
+const categories = require("./app/routes/categories");
+const tags = require("./app/routes/tags");
+const products = require("./app/routes/products");
+const carts = require("./app/routes/carts");
 
 const app = express();
 
@@ -27,8 +33,48 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(bodyparser.urlencoded({ extended: false }));
-app.use(bodyparser.json());
+//creating session so that flash can save messages
+app.use(
+  session({
+    secret: "e-commerce",
+    saveUninitialized: true,
+    resave: true,
+  })
+);
+app.use(flash());
+
+//Data compression before the data is sent by api
+app.use(compression({ filter: shouldCompress }));
+function shouldCompress(req, res) {
+  if (req.headers["x-no-compression"]) {
+    // don't compress responses with this request header
+    return false;
+  }
+  // fallback to standard filter function
+  return compression.filter(req, res);
+}
+
+//if express >= 4.16.0, then bodyParser has been re-added under the methods express.json() and express.urlencoded()
+// app.use(bodyParser.urlencoded({ extended: false }));
+// app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+
+app.use("/a", (req, res) => {
+  let a = req.flash("Name");
+  req.flash("Name", "a");
+  res.status(200).send(a);
+});
+
+app.use("/b", (req, res) => {
+  let a = req.flash("Name");
+  req.flash("Name", "b");
+  res.status(200).send(a);
+});
+
+app.use("/c", (req, res) => {
+  res.status(200).send(req.flash("Name"));
+});
 
 app.use("/users", users);
 app.use("/orders", orders);

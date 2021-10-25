@@ -1,17 +1,18 @@
 const { MongoClient, ObjectID } = require("mongodb");
+const { MONGODB_URL, DB_1 } = require("../../config/mongoConfig");
 
-const { MONGODB_URL } = require("../../resources/mongoConfig");
 const client = new MongoClient(MONGODB_URL);
+const db = client.db(DB_1);
 
 exports.ObjectId = ObjectID;
 
-exports.findOne = async (db, collection, query) => {
+exports.findOne = async (collection, query) => {
   try {
     if (!query) {
       query = {};
     }
     await client.connect();
-    const result = await client.db(db).collection(collection).findOne(query);
+    const result = await db.collection(collection).findOne(query);
     if (result) {
       return result;
     } else {
@@ -26,17 +27,13 @@ exports.findOne = async (db, collection, query) => {
   }
 };
 
-exports.find = async (db, collection, query) => {
+exports.find = async (collection, query) => {
   try {
     if (!query) {
       query = {};
     }
     await client.connect();
-    const result = await client
-      .db(db)
-      .collection(collection)
-      .find(query)
-      .toArray();
+    const result = await db.collection(collection).find(query).toArray();
     if (result) {
       return result;
     } else {
@@ -51,14 +48,14 @@ exports.find = async (db, collection, query) => {
   }
 };
 
-exports.insertOne = async (db, collection, data) => {
+exports.insertOne = async (collection, data) => {
   try {
     if (!data) {
       console.log("Nothing inserted");
       return [];
     }
     await client.connect();
-    const result = await client.db(db).collection(collection).insertOne(data);
+    const result = await db.collection(collection).insertOne(data);
     if (result) {
       return result;
     } else {
@@ -73,17 +70,14 @@ exports.insertOne = async (db, collection, data) => {
   }
 };
 
-exports.insertMany = async (db, collection, data) => {
+exports.insertMany = async (collection, data) => {
   try {
     if (!data) {
       console.log("Nothing inserted");
       return [];
     }
     await client.connect();
-    const insertData = await client
-      .db(db)
-      .collection(collection)
-      .insertMany(data);
+    const insertData = await db.collection(collection).insertMany(data);
     if (insertData.insertedCount > 0) {
       return insertData;
     } else {
@@ -98,15 +92,14 @@ exports.insertMany = async (db, collection, data) => {
   }
 };
 
-exports.update = async (db, collection, query, data) => {
+exports.update = async (collection, query, data) => {
   try {
     if (!query || !data) {
       console.log("Nothing Updated");
       return [];
     }
     await client.connect();
-    const result = await client
-      .db(db)
+    const result = await db
       .collection(collection)
       .updateOne(query, { $set: data });
     if (result) {
@@ -123,13 +116,13 @@ exports.update = async (db, collection, query, data) => {
   }
 };
 
-exports.deleteOne = async (db, collection, query) => {
+exports.deleteOne = async (collection, query) => {
   try {
     if (!query) {
       query = {};
     }
     await client.connect();
-    const result = await client.db(db).collection(collection).deleteOne(query);
+    const result = await db.collection(collection).deleteOne(query);
     if (result) {
       return result;
     } else {
@@ -144,13 +137,13 @@ exports.deleteOne = async (db, collection, query) => {
   }
 };
 
-exports.deleteMany = async (db, collection, query) => {
+exports.deleteMany = async (collection, query) => {
   try {
     if (!query) {
       query = {};
     }
     await client.connect();
-    const result = await client.db(db).collection(collection).deleteMany(query);
+    const result = await db.collection(collection).deleteMany(query);
     if (result) {
       return result;
     } else {
