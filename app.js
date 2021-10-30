@@ -9,12 +9,14 @@ const compression = require("compression");
 
 const users = require("./app/routes/users");
 const modules = require("./app/routes/modules");
-const orders = require("./app/routes/orders");
-const roles = require("./app/routes/roles");
-const categories = require("./app/routes/categories");
-const tags = require("./app/routes/tags");
-const products = require("./app/routes/products");
-const carts = require("./app/routes/carts");
+const permissions = require("./app/routes/permissions");
+
+// const orders = require("./app/routes/orders");
+// const roles = require("./app/routes/roles");
+// const categories = require("./app/routes/categories");
+// const tags = require("./app/routes/tags");
+// const products = require("./app/routes/products");
+// const carts = require("./app/routes/carts");
 
 const app = express();
 
@@ -79,12 +81,14 @@ app.use("/c", (req, res) => {
 
 app.use("/users", users);
 app.use("/modules", modules);
-app.use("/orders", orders);
-app.use("/roles", roles);
-app.use("/categories", categories);
-app.use("/tags", tags);
-app.use("/products", products);
-app.use("/carts", carts);
+app.use("/permissions",permissions);
+
+// app.use("/orders", orders);
+// app.use("/roles", roles);
+// app.use("/categories", categories);
+// app.use("/tags", tags);
+// app.use("/products", products);
+// app.use("/carts", carts);
 
 //Handling Errors
 app.use((req, res, next) => {

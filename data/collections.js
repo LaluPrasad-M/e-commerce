@@ -7,4 +7,5 @@ module.exports = {
   tags: "tags",
   users: "users",
   modules: "modules",
+  permissions: "permissions"
 };

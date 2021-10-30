@@ -1,0 +1,19 @@
+{
+  "_id": { "$oid": "617d790e1e27b835d95d6342" },
+  "name": "Module 1",
+  "type": "main",
+  "submodules": [
+    {
+      "_id": { "$oid": "617d79631e27b835d95d6344" },
+      "name": "submodule 1.1",
+      "type": "sub",
+      "mainModule": "617d790e1e27b835d95d6342"
+    },
+    {
+      "_id": { "$oid": "617d797c1e27b835d95d6345" },
+      "name": "submodule 1.2",
+      "type": "sub",
+      "mainModule": "617d790e1e27b835d95d6342"
+    }
+  ]
+}

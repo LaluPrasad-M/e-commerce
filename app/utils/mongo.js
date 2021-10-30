@@ -59,7 +59,7 @@ exports.findOneAndUpdate = async (collection, filterQuery, data) => {
     await client.connect();
     const result = await db
       .collection(collection)
-      .findOneAndUpdate(filterQuery, data);
+      .findOneAndUpdate(filterQuery,data,{upsert:true});
     if (result) {
       console.log(result);
       return result;

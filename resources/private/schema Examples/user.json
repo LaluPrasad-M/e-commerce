@@ -1,0 +1,11 @@
+{
+  "_id": { "$oid": "617d783d60fbf5fe0a276880" },
+  "name": "LaluPrasad M",
+  "email": "laluprasad.73515274@gmail.com",
+  "password": "$2a$10$k2gO14RWtFBRkOts4zg4VedVzDqrZiw5YOAWWJiSYiZAJRcUB7Bfe",
+  "role": "rootAdmin",
+  "phone": "+919035229611",
+  "dob": "09-09-1999",
+  "empId": "laluprasad.73515274_rHGoM3VF07",
+  "companyId": "rootCompany"
+}

@@ -23,6 +23,11 @@ exports.postLogin = async (req, res) => {
         let tokenQuery = {
           name: user.name,
           email: user.email,
+          phone: user.phone,
+          role: user.role,
+          manager: user.manager,
+          empId: user.empId,
+          companyId: user.companyId
         };
         let token = await authentication.generateSessionToken(
           reqBodyPassword,
