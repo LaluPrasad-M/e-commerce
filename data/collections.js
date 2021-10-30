@@ -6,4 +6,5 @@ module.exports = {
   roles: "roles",
   tags: "tags",
   users: "users",
+  modules: "modules",
 };

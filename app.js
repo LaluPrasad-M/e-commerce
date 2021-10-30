@@ -8,6 +8,7 @@ const compression = require("compression");
 // const bodyParser = require("body-parser");
 
 const users = require("./app/routes/users");
+const modules = require("./app/routes/modules");
 const orders = require("./app/routes/orders");
 const roles = require("./app/routes/roles");
 const categories = require("./app/routes/categories");
@@ -77,6 +78,7 @@ app.use("/c", (req, res) => {
 });
 
 app.use("/users", users);
+app.use("/modules", modules);
 app.use("/orders", orders);
 app.use("/roles", roles);
 app.use("/categories", categories);

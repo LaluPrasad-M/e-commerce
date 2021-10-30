@@ -50,6 +50,31 @@ exports.find = async (collection, query) => {
   }
 };
 
+exports.findOneAndUpdate = async (collection, filterQuery, data) => {
+  try {
+    if (!filterQuery) {
+      console.log("Nothing Updated");
+      return null;
+    }
+    await client.connect();
+    const result = await db
+      .collection(collection)
+      .findOneAndUpdate(filterQuery, data);
+    if (result) {
+      console.log(result);
+      return result;
+    } else {
+      console.log("Nothing Updated");
+      return null;
+    }
+  } catch (e) {
+    console.log(e.message);
+    return [];
+  } finally {
+    client.close();
+  }
+};
+
 exports.insertOne = async (collection, data) => {
   try {
     if (!data) {
