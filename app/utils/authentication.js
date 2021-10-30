@@ -33,13 +33,22 @@ exports.generateSessionToken = async (
 
 exports.checkAuth = (req, res, next) => {
   try {
-    const token = req.query.token || req.body.token || req.flash('token')[0] || req.headers["x-access-token"];
-    req.flash('token',token);
-    const decoded = jwt.verify(token, JWT_KEY);
-    req.userData = decoded;
-    next();
+    const token =
+      req.query.token ||
+      req.body.token ||
+      req.flash("token")[0] ||
+      req.headers["x-access-token"];
+    if (token) {
+      req.flash("token", token);
+      const decoded = jwt.verify(token, JWT_KEY);
+      req.userData = decoded;
+      next();
+    } else {
+      return res.json({ message: "Please login" });
+    }
   } catch (error) {
-    res.redirect("/");
-    return res.status(401);
+    res.status(401);
+    console.log(error);
+    res.json({ message: "Invalid User!" });
   }
 };

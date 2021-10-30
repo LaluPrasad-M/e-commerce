@@ -14,14 +14,15 @@ exports.findOne = async (collection, query) => {
     await client.connect();
     const result = await db.collection(collection).findOne(query);
     if (result) {
+      console.log(result);
       return result;
     } else {
       console.log("Nothing Found", query);
-      return undefined;
+      return null;
     }
   } catch (e) {
     console.log(e.message);
-    return undefined;
+    return null;
   } finally {
     client.close();
   }
@@ -35,6 +36,7 @@ exports.find = async (collection, query) => {
     await client.connect();
     const result = await db.collection(collection).find(query).toArray();
     if (result) {
+      console.log(result);
       return result;
     } else {
       console.log("Nothing Found", query);
@@ -57,6 +59,7 @@ exports.insertOne = async (collection, data) => {
     await client.connect();
     const result = await db.collection(collection).insertOne(data);
     if (result) {
+      console.log(result);
       return result;
     } else {
       console.log("Nothing Found", query);
@@ -79,6 +82,7 @@ exports.insertMany = async (collection, data) => {
     await client.connect();
     const insertData = await db.collection(collection).insertMany(data);
     if (insertData.insertedCount > 0) {
+      console.log(insertData);
       return insertData;
     } else {
       console.log("Nothing inserted");
@@ -103,6 +107,7 @@ exports.update = async (collection, query, data) => {
       .collection(collection)
       .updateOne(query, { $set: data });
     if (result) {
+      console.log(result);
       return result;
     } else {
       console.log("Nothing Updated");
@@ -124,6 +129,7 @@ exports.deleteOne = async (collection, query) => {
     await client.connect();
     const result = await db.collection(collection).deleteOne(query);
     if (result) {
+      console.log(result);
       return result;
     } else {
       console.log("Nothing deleted");
@@ -145,6 +151,7 @@ exports.deleteMany = async (collection, query) => {
     await client.connect();
     const result = await db.collection(collection).deleteMany(query);
     if (result) {
+      console.log(result);
       return result;
     } else {
       console.log("Nothing deleted");

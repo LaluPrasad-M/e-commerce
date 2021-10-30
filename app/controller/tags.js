@@ -21,7 +21,14 @@ exports.getUserDetails = async function (req, res) {
 exports.updateUsers = async function (req, res) {
   let query = { _id: mongo.ObjectId(req.params.id) };
   let data = req.body;
-  const result = await mongo.update(collections.tags, query, data);
+  let result = await mongo.update(collections.tags, query, data);
+  result = {
+    ...result,
+    request: {
+      type: "GET",
+      url: req.headers.host + "/" + collections.tags + "/" + query._id,
+    },
+  };
   res.status(200).json(result);
 };
 
