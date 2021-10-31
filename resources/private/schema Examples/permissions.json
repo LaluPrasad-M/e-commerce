@@ -2,11 +2,7 @@
   "_id": { "$oid": "617d914730c3ebc9659db217" },
   "companyId": "rootCompany",
   "role": "rootAdmin",
-  "canCreateCustomer": "false",
-  "canCreateUser": "true",
-  "modulesEnabled": [
-    "617d790e1e27b835d95d6342",
-    "617d79961e27b835d95d6347",
-    "617d79811e27b835d95d6346"
-  ]
+  "canCreateCustomer": false,
+  "canCreateUser": true,
+  "modulesEnabled": ["submodule1A_5HDXLdhrIO", "submodule2B_o2JoEopCy5"]
 }

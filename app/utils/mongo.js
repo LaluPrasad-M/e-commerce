@@ -28,13 +28,20 @@ exports.findOne = async (collection, query) => {
   }
 };
 
-exports.find = async (collection, query) => {
+exports.find = async (collection, query, projection) => {
   try {
     if (!query) {
       query = {};
     }
+    if (!projection) {
+      projection = {};
+    }
     await client.connect();
-    const result = await db.collection(collection).find(query).toArray();
+    const result = await db
+      .collection(collection)
+      .find(query)
+      .project(projection)
+      .toArray();
     if (result) {
       console.log(result);
       return result;
@@ -59,7 +66,7 @@ exports.findOneAndUpdate = async (collection, filterQuery, data) => {
     await client.connect();
     const result = await db
       .collection(collection)
-      .findOneAndUpdate(filterQuery,data,{upsert:true});
+      .findOneAndUpdate(filterQuery, data, { upsert: true });
     if (result) {
       console.log(result);
       return result;

@@ -1,19 +1,19 @@
 {
-  "_id": { "$oid": "617d790e1e27b835d95d6342" },
-  "name": "Module 1",
+  "_id": { "$oid": "617ec48355591b366b6940ce" },
+  "name": "module 1",
   "type": "main",
   "submodules": [
     {
-      "_id": { "$oid": "617d79631e27b835d95d6344" },
-      "name": "submodule 1.1",
+      "_id": "submodule1A_5HDXLdhrIO",
+      "name": "submodule 1A",
       "type": "sub",
-      "mainModule": "617d790e1e27b835d95d6342"
+      "mainModule": "617ec48355591b366b6940ce"
     },
     {
-      "_id": { "$oid": "617d797c1e27b835d95d6345" },
-      "name": "submodule 1.2",
+      "_id": "submodule1B_wUH5NHs1C0",
+      "name": "submodule 1B",
       "type": "sub",
-      "mainModule": "617d790e1e27b835d95d6342"
+      "mainModule": "617ec48355591b366b6940ce"
     }
   ]
 }

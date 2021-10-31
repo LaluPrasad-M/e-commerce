@@ -1,11 +1,32 @@
 const mongo = require("../utils/mongo");
 const collections = require("../../data/collections");
-
+const makeId = require("../utils/commonUtils");
 let moduleTypes = { main: "main", sub: "sub" };
 
 exports.getModules = async function (req, res) {
-  const result = await mongo.find(collections.modules);
-  return res.status(200).json(result);
+  let userData = req.userData || req.body;
+  if (!userData.role || !userData.companyId) {
+    return res.status(403).json({ message: "Invalid User Login." });
+  }
+  let query = { role: userData.role, companyId: userData.companyId };
+  const permittedModules = await mongo.findOne(collections.permissions, query);
+
+  if (permittedModules && permittedModules.modulesEnabled) {
+    query = { "submodules._id": { $in: permittedModules.modulesEnabled } };
+    let projection = {
+      name: true,
+      submodules: {
+        $elemMatch: {
+          _id: { $in: permittedModules.modulesEnabled },
+        },
+      },
+    };
+    const result = await mongo.find(collections.modules, query, projection);
+    console.log(result);
+    return res.status(200).json(result);
+  } else {
+    return res.status(500).json({ message: "No Modules found." });
+  }
 };
 
 exports.postModules = async function (req, res) {
@@ -21,7 +42,8 @@ exports.postModules = async function (req, res) {
       mainModuleQuery
     );
     if (mainModule) {
-      data = { submodules: mainModule.submodules.concat({_id: new mongo.ObjectId(),...data}) };
+      let id = await makeId(10, data.name);
+      data = { submodules: mainModule.submodules.concat({ _id: id, ...data }) };
       const result = await mongo.update(
         collections.modules,
         mainModuleQuery,

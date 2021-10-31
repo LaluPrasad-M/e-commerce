@@ -15,10 +15,10 @@ exports.postAdd = async (req, res) => {
       modulesEnabled: { $each: data.modulesEnabled },
     };
   }
-  if (data.canCreateUser) {
+  if (data.canCreateUser === true || data.canCreateUser === false) {
     updationData["$set"].canCreateUser = data.canCreateUser;
   }
-  if (data.canCreateCustomer) {
+  if (data.canCreateCustomer === true || data.canCreateCustomer === false) {
     updationData["$set"].canCreateCustomer = data.canCreateCustomer;
   }
 
@@ -50,10 +50,10 @@ exports.postRevoke = async (req, res) => {
   if (data.modulesEnabled) {
     updationData["$pullAll"] = { modulesEnabled: data.modulesEnabled };
   }
-  if (data.canCreateUser) {
+  if (data.canCreateUser === true || data.canCreateUser === false) {
     updationData["$set"].canCreateUser = data.canCreateUser;
   }
-  if (data.canCreateCustomer) {
+  if (data.canCreateCustomer === true || data.canCreateCustomer === false) {
     updationData["$set"].canCreateCustomer = data.canCreateCustomer;
   }
 
