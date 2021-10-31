@@ -1,4 +1,4 @@
-module.exports = makeId = (length, startString) => {
+exports.makeId = (length, startString) => {
   var result = "";
   if (startString) {
     if (startString.lastIndexOf("@") !== -1) {

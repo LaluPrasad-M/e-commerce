@@ -1,13 +1,14 @@
 const mongo = require("../utils/mongo");
 const collections = require("../../data/collections");
-const makeId = require("../utils/commonUtils");
+const commonUtils = require("../utils/commonUtils");
 let moduleTypes = { main: "main", sub: "sub" };
 
-exports.getModules = async function (req, res) {
+exports.getPermittedModules = async function (req, res) {
   let userData = req.userData || req.body;
   if (!userData.role || !userData.companyId) {
     return res.status(403).json({ message: "Invalid User Login." });
   }
+
   let query = { role: userData.role, companyId: userData.companyId };
   const permittedModules = await mongo.findOne(collections.permissions, query);
 
@@ -42,7 +43,7 @@ exports.postModules = async function (req, res) {
       mainModuleQuery
     );
     if (mainModule) {
-      let id = await makeId(10, data.name);
+      let id = await commonUtils.makeId(10, data.name);
       data = { submodules: mainModule.submodules.concat({ _id: id, ...data }) };
       const result = await mongo.update(
         collections.modules,
