@@ -1,11 +1,13 @@
-{
-  "module_code": "module1_aDCI7tvlRt",
-  "name": "module 1",
-  "submodules": [
-    {
-      "module_code": "module1A_9nhxVngR9U",
-      "name": "module 1A",
-      "permitted_role_codes": ["RootAdmin_g9YUS2mRBc"]
-    }
-  ]
-}
+[
+  {
+    "module_code": "module1_aDCI7tvlRt",
+    "name": "module 1",
+    "submodules": [
+      {
+        "module_code": "module1A_9nhxVngR9U",
+        "name": "module 1A",
+        "permitted_role_codes": ["RootAdmin_g9YUS2mRBc"]
+      }
+    ]
+  }
+]

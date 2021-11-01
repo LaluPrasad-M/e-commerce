@@ -1,6 +1,14 @@
-{
-  "role_name": "Root Admin",
-  "company_name": "Root Company",
-  "user_type": "Root",
-  "role_code": "RootAdmin_g9YUS2mRBc"
-}
+[
+  {
+    "role_name": "Root Admin",
+    "company_name": "Root Company",
+    "user_type": "Root",
+    "role_code": "RootAdmin_g9YUS2mRBc"
+  },
+  {
+    "role_name": "Root Manager",
+    "company_name": "Root Company",
+    "user_type": "Manager",
+    "role_code": "RootManager_lwvOH8Qvqy"
+  }
+]

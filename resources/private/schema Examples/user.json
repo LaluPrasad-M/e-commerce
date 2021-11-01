@@ -1,10 +1,22 @@
-{
-  "name": "LaluPrasad M",
-  "email": "laluprasad.73515274@gmail.com",
-  "phone": "+919035229611",
-  "password": "$2a$10$bR2/.EgtlxhMSX7puSv1het9Eqg9nQ4G2vpTcJuqlkwuEQvkaHqbq",
-  "dob": "09-09-1999",
-  "manager": null,
-  "role_code": "RootAdmin_g9YUS2mRBc",
-  "user_code": "laluprasad.73515274_zsIm3qcsLQ"
-}
+[
+  {
+    "name": "LaluPrasad M",
+    "email": "laluprasad.73515274@gmail.com",
+    "phone": "+919035229611",
+    "password": "$2a$10$bR2/.EgtlxhMSX7puSv1het9Eqg9nQ4G2vpTcJuqlkwuEQvkaHqbq",
+    "dob": "09-09-1999",
+    "manager": null,
+    "role_code": "RootAdmin_g9YUS2mRBc",
+    "user_code": "laluprasad.73515274_zsIm3qcsLQ"
+  },
+  {
+    "name": "root Manager",
+    "email": "root.manager@gmail.com",
+    "phone": "+919035229600",
+    "password": "$2a$10$WQ/HNaLEAsl9eCRqDbSdP.k90KF6uNPv3/0JSSD1gAbGNR54lqF12",
+    "dob": "01-01-1995",
+    "manager": "laluprasad.73515274_zsIm3qcsLQ",
+    "role_code": "RootManager_lwvOH8Qvqy",
+    "user_code": "root.manager_tndKnRXyrc"
+  }
+]
