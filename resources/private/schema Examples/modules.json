@@ -1,19 +1,16 @@
 {
-  "_id": { "$oid": "617ec48355591b366b6940ce" },
+  "module_code": "module1_5HDXLdhrIO",
   "name": "module 1",
-  "type": "main",
   "submodules": [
     {
-      "_id": "submodule1A_5HDXLdhrIO",
+      "module_code": "submodule1A_5HDXLdhrIO",
       "name": "submodule 1A",
-      "type": "sub",
-      "mainModule": "617ec48355591b366b6940ce"
+      "permitted_role_codes": ["rootAdmin_mJ8Hi78hHs"]
     },
     {
-      "_id": "submodule1B_wUH5NHs1C0",
+      "module_code": "submodule1B_wUH5NHs1C0",
       "name": "submodule 1B",
-      "type": "sub",
-      "mainModule": "617ec48355591b366b6940ce"
+      "permitted_role_codes": ["rootAdmin_mJ8Hi78hHs"]
     }
   ]
 }

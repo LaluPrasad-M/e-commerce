@@ -1,8 +1,6 @@
 {
-  "_id": { "$oid": "617d914730c3ebc9659db217" },
-  "companyId": "rootCompany",
-  "role": "rootAdmin",
-  "canCreateCustomer": false,
-  "canCreateUser": true,
-  "modulesEnabled": ["submodule1A_5HDXLdhrIO", "submodule2B_o2JoEopCy5"]
+  "permission_code": "mJ8Hi78hHs",
+  "role_code": "rootAdmin_mJ8Hi78hHs",
+  "can_create_users": true,
+  "can_create_customers": false
 }
