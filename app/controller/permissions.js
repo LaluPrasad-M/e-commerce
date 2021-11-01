@@ -25,7 +25,8 @@ exports.postAdd = async (req, res) => {
   const result = await mongo.findOneAndUpdate(
     collections.permissions,
     filterQuery,
-    updationData
+    updationData,
+    { upsert: true }
   );
   if (result.lastErrorObject.updatedExisting) {
     return res.status(200).json({ message: "Data Updated Successfully." });

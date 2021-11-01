@@ -1,11 +1,11 @@
 {
-  "module_code": "module1_5HDXLdhrIO",
+  "module_code": "module1_aDCI7tvlRt",
   "name": "module 1",
   "submodules": [
     {
-      "module_code": "submodule1A_5HDXLdhrIO",
-      "name": "submodule 1A",
-      "permitted_role_codes": ["rootAdmin_mJ8Hi78hHs"]
+      "module_code": "module1A_9nhxVngR9U",
+      "name": "module 1A",
+      "permitted_role_codes": ["role_code"]
     },
     {
       "module_code": "submodule1B_wUH5NHs1C0",

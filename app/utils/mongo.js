@@ -57,23 +57,20 @@ exports.find = async (collection, query, projection) => {
   }
 };
 
-exports.findOneAndUpdate = async (collection, filterQuery, data) => {
+exports.findOneAndUpdate = async (collection, filterQuery, data, callback) => {
   try {
     if (!filterQuery) {
       console.log("Nothing Updated");
       return null;
     }
+    if(!callback){
+      callback = {}
+    }
     await client.connect();
     const result = await db
       .collection(collection)
-      .findOneAndUpdate(filterQuery, data, { upsert: true });
-    if (result) {
-      console.log(result);
-      return result;
-    } else {
-      console.log("Nothing Updated");
-      return null;
-    }
+      .findOneAndUpdate(filterQuery, data,callback);
+    return result.lastErrorObject.updatedExisting;
   } catch (e) {
     console.log(e.message);
     return [];
