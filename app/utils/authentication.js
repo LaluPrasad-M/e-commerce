@@ -23,11 +23,11 @@ exports.generateSessionToken = async (
       return token;
     } else {
       console.log("wrong Password");
-      return [];
+      return null;
     }
   } catch (error) {
     console.log(error);
-    return [];
+    return null;
   }
 };
 

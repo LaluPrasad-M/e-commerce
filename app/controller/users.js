@@ -40,7 +40,9 @@ exports.postSignup = async (req, res) => {
     return res.status(200).json(result);
   } else {
     console.log("Nothing Inserted. Please try again later");
-    res.status(500).json("Nothing Inserted. Please try again later");
+    res
+      .status(500)
+      .json({ message: "Nothing Inserted. Please try again later" });
   }
 };
 
@@ -71,7 +73,7 @@ exports.postLogin = async (req, res) => {
           user.password,
           tokenQuery
         );
-        if (token.length) {
+        if (token) {
           await req.flash("token", token);
           return res.status(200).json({ token });
         }
