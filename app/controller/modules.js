@@ -99,10 +99,11 @@ exports.updateModules = async function (req, res) {
   let modulesToEnable = req.body.enable || [];
   let modulesToDisable = req.body.disable || [];
   let result = "";
-  if (
-    (await commonUtils.getArraysIntersection(modulesToEnable, modulesToDisable))
-      .length
-  ) {
+  let commonElements = await commonUtils.getArraysIntersection(
+    modulesToEnable,
+    modulesToDisable
+  );
+  if (!commonElements.length) {
     if (modulesToEnable.length) {
       let data = {
         $addToSet: { "submodules.$.permitted_role_codes": { $each: enable } },
@@ -130,10 +131,10 @@ exports.updateModules = async function (req, res) {
       }
     }
     if (result !== "") {
-      res.status(200).json({ message: result });
+      return res.status(200).json({ message: result });
     } else {
       console.log("Module Permissions are not changed for any users");
-      res
+      return res
         .status(403)
         .json({ message: "Module Permissions are not changed for any users" });
     }
