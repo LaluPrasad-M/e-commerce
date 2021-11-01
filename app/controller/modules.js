@@ -5,7 +5,7 @@ const commonUtils = require("../utils/commonUtils");
 let moduleTypes = { main: "main", sub: "sub" };
 
 exports.getPermittedModules = async function (req, res) {
-  console.log(req.userData)
+  console.log(req.userData);
   let user_role = req.userData.role_code;
   let query = { "submodules.permitted_role_codes": user_role };
   let projection = {
@@ -86,11 +86,63 @@ exports.getModuleDetails = async function (req, res) {
   res.status(200).json(result);
 };
 
+/*
+/:module_code
+{
+  enable:["role_code"],
+  disable:["roles_code"]
+}
+*/
 exports.updateModules = async function (req, res) {
-  let query = { _id: mongo.ObjectId(req.params.id) };
-  let data = req.body;
-  const result = await mongo.update(collections.modules, query, data);
-  res.status(200).json(result);
+  let module_code = req.params.module_code;
+  let query = { "submodules.module_code": module_code };
+  let modulesToEnable = req.body.enable || [];
+  let modulesToDisable = req.body.disable || [];
+  let result = "";
+  if (
+    (await commonUtils.getArraysIntersection(modulesToEnable, modulesToDisable))
+      .length
+  ) {
+    if (modulesToEnable.length) {
+      let data = {
+        $addToSet: { "submodules.$.permitted_role_codes": { $each: enable } },
+      };
+      let updationResult = await mongo.findOneAndUpdate(
+        collections.modules,
+        query,
+        data
+      );
+      if (updationResult) {
+        console.log("Modules Enables Successfully.");
+        result += "Modules Enables Successfully. ";
+      }
+    }
+    if (modulesToDisable.length) {
+      let data = { $pullAll: { "submodules.$.permitted_role_codes": enable } };
+      let updationResult = await mongo.findOneAndUpdate(
+        collections.modules,
+        query,
+        data
+      );
+      if (updationResult) {
+        console.log("Modules Disabled Successfully.");
+        result += "Modules Disabled Successfully. ";
+      }
+    }
+    if (result !== "") {
+      res.status(200).json({ message: result });
+    } else {
+      console.log("Module Permissions are not changed for any users");
+      res
+        .status(403)
+        .json({ message: "Module Permissions are not changed for any users" });
+    }
+  } else {
+    console.log("Cannot enable and disable the same module for the same user.");
+    return res.status("403").json({
+      message: "Cannot enable and disable the same module for the same user.",
+    });
+  }
 };
 
 exports.deleteModule = async function (req, res) {

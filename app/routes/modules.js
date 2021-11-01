@@ -6,8 +6,9 @@ const moduleController = require("../controller/modules");
 
 router.get("/", checkAuth, moduleController.getPermittedModules);
 router.post("/", checkAuth, moduleController.postModules);
+router.put("/:module_code", checkAuth, moduleController.updateModules);
+
 router.get("/:id", checkAuth, moduleController.getModuleDetails);
-router.put("/:id", checkAuth, moduleController.updateModules);
 router.delete("/:id", checkAuth, moduleController.deleteModule);
 
 module.exports = router;
