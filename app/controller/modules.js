@@ -106,7 +106,7 @@ exports.updateModules = async function (req, res) {
   if (!commonElements.length) {
     if (modulesToEnable.length) {
       let data = {
-        $addToSet: { "submodules.$.permitted_role_codes": { $each: enable } },
+        $addToSet: { "submodules.$.permitted_role_codes": { $each: modulesToEnable } },
       };
       let updationResult = await mongo.findOneAndUpdate(
         collections.modules,
@@ -114,12 +114,12 @@ exports.updateModules = async function (req, res) {
         data
       );
       if (updationResult) {
-        console.log("Modules Enables Successfully.");
-        result += "Modules Enables Successfully. ";
+        console.log("Modules Enabled Successfully.");
+        result += "Modules Enabled Successfully. ";
       }
     }
     if (modulesToDisable.length) {
-      let data = { $pullAll: { "submodules.$.permitted_role_codes": enable } };
+      let data = { $pullAll: { "submodules.$.permitted_role_codes": modulesToDisable } };
       let updationResult = await mongo.findOneAndUpdate(
         collections.modules,
         query,
