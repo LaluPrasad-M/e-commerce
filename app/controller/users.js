@@ -3,6 +3,17 @@ const collections = require("../../data/collections");
 const authentication = require("../utils/authentication");
 const commonUtils = require("../utils/commonUtils");
 
+/*
+{
+  "name": "user name",
+  "email": "user.mail@email.com",
+  "phone": "+919876543210",
+  "password": "password",
+  "dob": "01-01-2000",
+  "manager": "Manager Name",
+  "role_code": "role_code"
+}
+*/
 exports.postSignup = async (req, res) => {
   let data = req.body;
   let userExists = await mongo.findOne(collections.users, {
@@ -10,15 +21,35 @@ exports.postSignup = async (req, res) => {
   });
   if (userExists) {
     return res
-      .status(200)
+      .status(403)
       .json({ message: "User already exists! Please try Logging in" });
   }
-  data['empId'] = await commonUtils.makeId(10,data.email)
+  let valid_role = await mongo.findOne(collections.roles, {
+    role_code: data.role_code,
+  });
+  if (valid_role) {
+    console.log("Invalid Role id. Please enter a valid role code");
+    return res
+      .status(403)
+      .json({ message: "Invalid Role id. Please enter a valid role code" });
+  }
+  data["user_code"] = await commonUtils.makeId(10, data.email);
   data["password"] = await authentication.hash(data.password);
   let result = await mongo.insertOne(collections.users, data);
-  return res.status(200).json(result);
+  if (result) {
+    return res.status(200).json(result);
+  } else {
+    console.log("Nothing Inserted. Please try again later");
+    res.status(500).json("Nothing Inserted. Please try again later");
+  }
 };
 
+/*
+{
+  "email":"user.mail@email.com",
+  "password":"password"
+}
+*/
 exports.postLogin = async (req, res) => {
   try {
     let email = req.body.email;
@@ -27,13 +58,13 @@ exports.postLogin = async (req, res) => {
       const user = await mongo.findOne(collections.users, { email: email });
       if (user) {
         let tokenQuery = {
+          user_code: user.user_code,
           name: user.name,
           email: user.email,
           phone: user.phone,
-          role: user.role,
+          dob: user.dob,
+          role_code: user.role_code,
           manager: user.manager,
-          empId: user.empId,
-          companyId: user.companyId,
         };
         let token = await authentication.generateSessionToken(
           reqBodyPassword,

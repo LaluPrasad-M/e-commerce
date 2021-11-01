@@ -14,7 +14,7 @@ exports.findOne = async (collection, query) => {
     await client.connect();
     const result = await db.collection(collection).findOne(query);
     if (result) {
-      console.log(result);
+      console.log("result",result);
       return result;
     } else {
       console.log("Nothing Found", query);
@@ -83,7 +83,7 @@ exports.insertOne = async (collection, data) => {
   try {
     if (!data) {
       console.log("Nothing inserted");
-      return [];
+      return null;
     }
     await client.connect();
     const result = await db.collection(collection).insertOne(data);
@@ -92,11 +92,11 @@ exports.insertOne = async (collection, data) => {
       return result;
     } else {
       console.log("Nothing Found", query);
-      return [];
+      return null;
     }
   } catch (e) {
     console.log(e.message);
-    return [];
+    return null;
   } finally {
     client.close();
   }
