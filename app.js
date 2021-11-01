@@ -8,11 +8,11 @@ const compression = require("compression");
 // const bodyParser = require("body-parser");
 
 const users = require("./app/routes/users");
+const roles = require("./app/routes/roles");
 const modules = require("./app/routes/modules");
 const permissions = require("./app/routes/permissions");
 
 // const orders = require("./app/routes/orders");
-// const roles = require("./app/routes/roles");
 // const categories = require("./app/routes/categories");
 // const tags = require("./app/routes/tags");
 // const products = require("./app/routes/products");
@@ -80,11 +80,11 @@ app.use("/c", (req, res) => {
 });
 
 app.use("/users", users);
+app.use("/roles", roles);
 app.use("/modules", modules);
-app.use("/permissions",permissions);
 
+// app.use("/permissions", permissions);
 // app.use("/orders", orders);
-// app.use("/roles", roles);
 // app.use("/categories", categories);
 // app.use("/tags", tags);
 // app.use("/products", products);

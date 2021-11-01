@@ -1,6 +1,6 @@
 {
-    "role_code":"rootAdmin_mJ8Hi78hHs",
-    "role_name":"root Admin",
-    "company_name":"Root Company",
-    "user_type":"Manager"
+  "role_name": "Root Admin",
+  "company_name": "Root Company",
+  "user_type": "Root",
+  "role_code": "RootAdmin_g9YUS2mRBc"
 }

@@ -5,12 +5,7 @@
     {
       "module_code": "module1A_9nhxVngR9U",
       "name": "module 1A",
-      "permitted_role_codes": ["role_code"]
-    },
-    {
-      "module_code": "submodule1B_wUH5NHs1C0",
-      "name": "submodule 1B",
-      "permitted_role_codes": ["rootAdmin_mJ8Hi78hHs"]
+      "permitted_role_codes": ["RootAdmin_g9YUS2mRBc"]
     }
   ]
 }

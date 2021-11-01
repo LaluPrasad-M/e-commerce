@@ -5,13 +5,14 @@ const commonUtils = require("../utils/commonUtils");
 let moduleTypes = { main: "main", sub: "sub" };
 
 exports.getPermittedModules = async function (req, res) {
+  console.log(req.userData)
   let user_role = req.userData.role_code;
   let query = { "submodules.permitted_role_codes": user_role };
   let projection = {
     name: true,
     submodules: {
       $elemMatch: {
-        permitted_role_codes: role_code,
+        permitted_role_codes: user_role,
       },
     },
   };

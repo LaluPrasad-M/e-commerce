@@ -5,13 +5,13 @@ const commonUtils = require("../utils/commonUtils");
 
 /*
 {
-  "name": "user name",
-  "email": "user.mail@email.com",
+  "name": "user name",    ==> required
+  "email": "user.mail@email.com", ==> required
   "phone": "+919876543210",
-  "password": "password",
+  "password": "password",   ==> required
   "dob": "01-01-2000",
-  "manager": "Manager Name",
-  "role_code": "role_code"
+  "manager": "Manager Name",  ==> required
+  "role_code": "role_code"    ==> required
 }
 */
 exports.postSignup = async (req, res) => {
@@ -27,7 +27,7 @@ exports.postSignup = async (req, res) => {
   let valid_role = await mongo.findOne(collections.roles, {
     role_code: data.role_code,
   });
-  if (valid_role) {
+  if (!valid_role) {
     console.log("Invalid Role id. Please enter a valid role code");
     return res
       .status(403)
@@ -68,6 +68,7 @@ exports.postLogin = async (req, res) => {
           role_code: user.role_code,
           manager: user.manager,
         };
+        console.log(tokenQuery)
         let token = await authentication.generateSessionToken(
           reqBodyPassword,
           user.password,
