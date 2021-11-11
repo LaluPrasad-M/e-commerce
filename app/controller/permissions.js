@@ -22,7 +22,7 @@ exports.postAdd = async (req, res) => {
     updationData["$set"].canCreateCustomer = data.canCreateCustomer;
   }
 
-  const result = await mongo.findOneAndUpdate(
+  let result = await mongo.findOneAndUpdate(
     collections.permissions,
     filterQuery,
     updationData,
@@ -58,7 +58,7 @@ exports.postRevoke = async (req, res) => {
     updationData["$set"].canCreateCustomer = data.canCreateCustomer;
   }
 
-  const result = await mongo.findOneAndUpdate(
+  let result = await mongo.findOneAndUpdate(
     collections.permissions,
     filterQuery,
     updationData
@@ -78,7 +78,7 @@ exports.getPermission = async (req, res) => {
     return res.status(403).json({ message: "Invalid User Login." });
   }
   let query = { role: userData.role, companyId: userData.companyId };
-  const result = await mongo.findOne(collections.permissions, query);
+  let result = await mongo.findOne(collections.permissions, query);
   if (result) {
     return res.status(200).json(result);
   } else {
@@ -87,7 +87,7 @@ exports.getPermission = async (req, res) => {
 };
 
 exports.getAllPermissions = async (req, res) => {
-  const result = await mongo.find(collections.permissions);
+  let result = await mongo.find(collections.permissions);
   if (result) {
     return res.status(200).json(result);
   } else {

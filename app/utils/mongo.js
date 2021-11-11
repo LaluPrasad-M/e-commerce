@@ -12,14 +12,8 @@ exports.findOne = async (collection, query) => {
       query = {};
     }
     await client.connect();
-    const result = await db.collection(collection).findOne(query);
-    if (result) {
-      console.log("result",result);
-      return result;
-    } else {
-      console.log("Nothing Found", query);
-      return null;
-    }
+    let result = await db.collection(collection).findOne(query);
+    return result;
   } catch (e) {
     console.log(e.message);
     return null;
@@ -37,21 +31,16 @@ exports.find = async (collection, query, projection) => {
       projection = {};
     }
     await client.connect();
-    const result = await db
+    let result = await db
       .collection(collection)
       .find(query)
       .project(projection)
       .toArray();
-    if (result) {
-      console.log(result);
-      return result;
-    } else {
-      console.log("Nothing Found", query);
-      return [];
-    }
+    console.log(result);
+    return result;
   } catch (e) {
     console.log(e.message);
-    return [];
+    return null;
   } finally {
     client.close();
   }
@@ -63,17 +52,17 @@ exports.findOneAndUpdate = async (collection, filterQuery, data, callback) => {
       console.log("Nothing Updated");
       return null;
     }
-    if(!callback){
-      callback = {}
+    if (!callback) {
+      callback = {};
     }
     await client.connect();
-    const result = await db
+    let result = await db
       .collection(collection)
-      .findOneAndUpdate(filterQuery, data,callback);
+      .findOneAndUpdate(filterQuery, data, callback);
     return result.lastErrorObject.updatedExisting;
   } catch (e) {
     console.log(e.message);
-    return [];
+    return null;
   } finally {
     client.close();
   }
@@ -86,7 +75,7 @@ exports.insertOne = async (collection, data) => {
       return null;
     }
     await client.connect();
-    const result = await db.collection(collection).insertOne(data);
+    let result = await db.collection(collection).insertOne(data);
     if (result) {
       console.log(result);
       return result;
@@ -132,7 +121,7 @@ exports.update = async (collection, query, data) => {
       return [];
     }
     await client.connect();
-    const result = await db
+    let result = await db
       .collection(collection)
       .updateOne(query, { $set: data });
     if (result) {
@@ -156,7 +145,7 @@ exports.deleteOne = async (collection, query) => {
       query = {};
     }
     await client.connect();
-    const result = await db.collection(collection).deleteOne(query);
+    let result = await db.collection(collection).deleteOne(query);
     if (result) {
       console.log(result);
       return result;
@@ -178,7 +167,7 @@ exports.deleteMany = async (collection, query) => {
       query = {};
     }
     await client.connect();
-    const result = await db.collection(collection).deleteMany(query);
+    let result = await db.collection(collection).deleteMany(query);
     if (result) {
       console.log(result);
       return result;

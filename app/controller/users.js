@@ -10,7 +10,7 @@ const commonUtils = require("../utils/commonUtils");
   "phone": "+919876543210",
   "password": "password",   ==> required
   "dob": "01-01-2000",
-  "manager": "Manager Name",  ==> required
+  "manager": "Manager's user_code",  ==> required
   "role_code": "role_code"    ==> required
 }
 */
@@ -97,25 +97,25 @@ exports.postLogout = async (req, res) => {
 };
 
 exports.getUsers = async (req, res) => {
-  const result = await mongo.find(collections.users);
+  let result = await mongo.find(collections.users);
   res.status(200).json(result);
 };
 
 exports.getUserDetails = async (req, res) => {
   let query = { _id: mongo.ObjectId(req.params.id) };
-  const result = await mongo.findOne(collections.users, query);
+  let result = await mongo.findOne(collections.users, query);
   res.status(200).json(result);
 };
 
 exports.updateUsers = async (req, res) => {
   let query = { _id: mongo.ObjectId(req.params.id) };
   let data = req.body;
-  const result = await mongo.update(collections.users, query, data);
+  let result = await mongo.update(collections.users, query, data);
   res.status(200).json(result);
 };
 
 exports.deleteUser = async (req, res) => {
   let query = { _id: mongo.ObjectId(req.params.id) };
-  const result = await mongo.deleteOne(collections.users, query);
+  let result = await mongo.deleteOne(collections.users, query);
   res.status(200).json(result);
 };

@@ -9,5 +9,16 @@
         "permitted_role_codes": ["RootAdmin_g9YUS2mRBc"]
       }
     ]
+  },
+  {
+    "module_code": "moduleABC_iY2MZ3Cz6G",
+    "name": "module ABC",
+    "submodules": [
+      {
+        "module_code": "submoduleXYZ_Ac1WNvaICb",
+        "name": "submodule XYZ",
+        "permitted_role_codes": ["RootManager_lwvOH8Qvqy"]
+      }
+    ]
   }
 ]

@@ -10,8 +10,9 @@ const compression = require("compression");
 const users = require("./app/routes/users");
 const roles = require("./app/routes/roles");
 const modules = require("./app/routes/modules");
-const permissions = require("./app/routes/permissions");
+const module_contents = require("./app/routes/module_contents");
 
+// const permissions = require("./app/routes/permissions");
 // const orders = require("./app/routes/orders");
 // const categories = require("./app/routes/categories");
 // const tags = require("./app/routes/tags");
@@ -63,25 +64,10 @@ function shouldCompress(req, res) {
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-app.use("/a", (req, res) => {
-  let a = req.flash("Name");
-  req.flash("Name", "a");
-  res.status(200).send(a);
-});
-
-app.use("/b", (req, res) => {
-  let a = req.flash("Name");
-  req.flash("Name", "b");
-  res.status(200).send(a);
-});
-
-app.use("/c", (req, res) => {
-  res.status(200).send(req.flash("Name"));
-});
-
 app.use("/users", users);
 app.use("/roles", roles);
 app.use("/modules", modules);
+app.use("/module_contents",module_contents);
 
 // app.use("/permissions", permissions);
 // app.use("/orders", orders);

@@ -1,11 +1,7 @@
 module.exports = {
-  carts: "carts",
-  categories: "categories",
-  orders: "orders",
-  products: "products",
   roles: "roles",
-  tags: "tags",
   users: "users",
   modules: "modules",
-  permissions: "permissions"
+  module_contents: "module_contents",
+  permissions: "permissions",
 };
