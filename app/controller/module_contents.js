@@ -1,7 +1,7 @@
-const mongo = require("../../utils/mongo");
-const collections = require("../../../data/collections");
-const commonUtils = require("../../utils/commonUtils");
-const custom_mappings = require("../../../data/custom_data/mappings/custom_mapping");
+const mongo = require("../utils/mongo");
+const collections = require("../../data/collections");
+const commonUtils = require("../utils/commonUtils");
+const custom_mappings = require("../../data/custom_data/mappings/custom_mapping");
 
 exports.get_module_contents = async function (req, res) {
   console.log(req.userData);
@@ -24,7 +24,7 @@ exports.get_module_contents = async function (req, res) {
 {
     "module_content_name":"module contents page name",
     "module_code":"module_code of the modules",
-    "data":["Array of details of the products or services"]
+    "data":[{name:"sweets",price:"500",image:"image_url"},{price:"300",name:"spice",order:"order"}]
 }
 */
 exports.post_module_contents = async function (req, res) {
