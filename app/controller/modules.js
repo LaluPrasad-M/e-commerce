@@ -1,7 +1,7 @@
 const mongo = require("../utils/mongo");
 const collections = require("../../data/collections");
 const commonUtils = require("../utils/commonUtils");
-const custom_mappings = require("../../data/custom-data/mappings/custom-mapping");
+const custom_mappings = require("../../data/custom_data/mappings/custom_mapping");
 
 let moduleTypes = { main: "main", sub: "sub" };
 

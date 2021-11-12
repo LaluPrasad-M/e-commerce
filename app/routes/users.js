@@ -1,16 +1,13 @@
-const express = require("express");
-const router = express.Router();
-
 const { checkAuth } = require("../utils/authentication");
 const userController = require("../controller/users");
 
-router.post("/signup", userController.postSignup);
-router.post("/login", userController.postLogin);
-router.post("/logout", userController.postLogout);
+module.exports = (app) => {
+  app.post("/users/signup", userController.postSignup);
+  app.post("/users/login", userController.postLogin);
+  app.post("/users/logout", userController.postLogout);
 
-router.get("/", checkAuth, userController.getUsers);
-router.get("/:id", checkAuth, userController.getUserDetails);
-router.put("/:id", checkAuth, userController.updateUsers);
-router.delete("/:id", checkAuth, userController.deleteUser);
-
-module.exports = router;
+  app.get("/users/", checkAuth, userController.getUsers);
+  app.get("/users/:id", checkAuth, userController.getUserDetails);
+  app.put("/users/:id", checkAuth, userController.updateUsers);
+  app.delete("/users/:id", checkAuth, userController.deleteUser);
+};

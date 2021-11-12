@@ -54,6 +54,7 @@ exports.postSignup = async (req, res) => {
 */
 exports.postLogin = async (req, res) => {
   try {
+    console.log(req.body)
     let email = req.body.email;
     let reqBodyPassword = req.body.password;
     if (email && reqBodyPassword) {

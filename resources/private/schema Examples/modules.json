@@ -5,8 +5,7 @@
     "submodules": [
       {
         "module_code": "module1A_9nhxVngR9U",
-        "name": "module 1A",
-        "permitted_role_codes": ["RootAdmin_g9YUS2mRBc"]
+        "name": "module 1A"
       }
     ]
   },
@@ -16,8 +15,7 @@
     "submodules": [
       {
         "module_code": "submoduleXYZ_Ac1WNvaICb",
-        "name": "submodule XYZ",
-        "permitted_role_codes": ["RootManager_lwvOH8Qvqy"]
+        "name": "submodule XYZ"
       }
     ]
   }

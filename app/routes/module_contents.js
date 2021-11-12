@@ -1,10 +1,7 @@
-const express = require("express");
-const router = express.Router();
-
 const { checkAuth } = require("../utils/authentication");
-const module_contents_controller = require("../controller/module_contents");
+const module_contents_controller = require("../controller/module_contents/module_contents.controller");
 
-router.get("/:module_code", checkAuth, module_contents_controller.get_module_contents);
-router.post("/", checkAuth, module_contents_controller.post_module_contents);
-
-module.exports = router;
+module.exports = (app) => {
+  app.get("/module_contents/:module_code", checkAuth, module_contents_controller.get_module_contents);
+  app.post("/module_contents/", checkAuth, module_contents_controller.post_module_contents);
+};
