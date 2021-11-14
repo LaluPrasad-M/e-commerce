@@ -3,7 +3,7 @@ const moduleController = require("../controller/modules");
 
 module.exports = (app) => {
   app.get("/c/:role_code", moduleController.getCustomerModules);
-  app.get("/modules/", checkAuth, moduleController.getPermittedModules);
+  app.get("/modules/", checkAuth, moduleController.getUserModules);
   app.post("/modules/", checkAuth, moduleController.postModules);
 
   // app.put("/:module_code", checkAuth, moduleController.updateModules);

@@ -5,6 +5,7 @@ const collections = require("../../data/collections");
 const commonUtils = require("../utils/commonUtils");
 const custom_mappings = require("../../data/custom_data/mappings/custom_mapping");
 
+//For Customers, these roles doesnt require login
 exports.getCustomerModules = async function (req, res) {
   let { role_code } = req.params;
   var role_details = await mongo.findOne(collections.roles, { role_code: role_code });
@@ -25,7 +26,9 @@ exports.getCustomerModules = async function (req, res) {
   return res.status(500).json({ message: "No Modules found." });
 };
 
-exports.getPermittedModules = async function (req, res) {
+
+//For Authorized Users, these roles require login
+exports.getUserModules = async function (req, res) {
   let user_role = req.userData.role_code;
 
   //get list of module_codes of all modules mapped to the role
