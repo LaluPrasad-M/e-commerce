@@ -3,3 +3,4 @@ exports.MONGODB_URL = 'mongodb+srv://user01:1234@sweet-orders-cluster.0apdk.mong
 
 exports.DB_1 = "myFirstDatabase";
 exports.DB_2 = "customerDatabase";
+exports.DB_3 = "AnotherDatabase";
