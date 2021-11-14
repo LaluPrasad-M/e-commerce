@@ -13,7 +13,7 @@ exports.walkRoutes = (path, app, fileNameRegex, skipFile) => {
         }
       }
     } else if (stat.isDirectory() && file !== skipFile) {
-      exports.walkRoutes(newPath, app.fileNameRegex, skipFile);
+      exports.walkRoutes(newPath, app, fileNameRegex, skipFile);
     }
   });
 };

@@ -1,25 +1,47 @@
+const _ = require("lodash");
+
 const mongo = require("../utils/mongo");
 const collections = require("../../data/collections");
 const commonUtils = require("../utils/commonUtils");
 const custom_mappings = require("../../data/custom_data/mappings/custom_mapping");
 
-let moduleTypes = { main: "main", sub: "sub" };
+exports.getCustomerModules = async function (req, res) {
+  let { role_code } = req.params;
+  var role_details = await mongo.findOne(collections.roles, { role_code: role_code });
+
+  //check if the role required a login
+  if (!_.isEmpty(role_details) && !role_details.requires_login) {
+    //get list of module_codes of all modules mapped to the role
+    let modules = custom_mappings.role_modules_mapping[role_code];
+    if (!_.isEmpty(modules)) {
+      let query = { "submodules.module_code": { $in: modules } };
+      let result = await mongo.find(collections.modules, query);
+      if (!_.isEmpty(result)) {
+        console.log(result);
+        return res.status(200).json(result);
+      }
+    }
+  }
+  return res.status(500).json({ message: "No Modules found." });
+};
 
 exports.getPermittedModules = async function (req, res) {
   let user_role = req.userData.role_code;
-  let modules = custom_mappings.role_modules_mapping[user_role];
-  console.log(user_role, modules);
 
-  if (modules) {
+  //get list of module_codes of all modules mapped to the role
+  let modules = custom_mappings.role_modules_mapping[user_role];
+  if (!_.isEmpty(modules)) {
     let query = { "submodules.module_code": { $in: modules } };
     let result = await mongo.find(collections.modules, query);
-    console.log(result);
-    if (result) {
+    if (!_.isEmpty(result)) {
+      console.log(result);
       return res.status(200).json(result);
     }
   }
   return res.status(500).json({ message: "No Modules found." });
 };
+
+let moduleTypes = { main: "main", sub: "sub" };
 
 /*
   {
@@ -34,6 +56,7 @@ exports.getPermittedModules = async function (req, res) {
 */
 exports.postModules = async function (req, res) {
   let data = req.body;
+  //if its a main Module
   if (data.type === moduleTypes.main) {
     let insertData = {
       module_code: commonUtils.makeId(10, data.name),
@@ -41,32 +64,30 @@ exports.postModules = async function (req, res) {
       submodules: [],
     };
     let result = await mongo.insertOne(collections.modules, insertData);
-    return res.status(200).json(result);
-  } else if (data.type === moduleTypes.sub) {
+    return res.status(200).json({ ...result, module_code: insertData.module_code });
+  } else if (data.type === moduleTypes.sub) { //if its a sub module
     let mainModuleQuery = { module_code: req.body.main_module };
+    let module_code = commonUtils.makeId(10, data.name);
+
+    //add the submodule to the main_module
     let updationData = {
       $addToSet: {
         submodules: {
-          module_code: commonUtils.makeId(10, data.name),
+          module_code: module_code,
           name: data.name,
         },
       },
     };
-    let result = await mongo.findOneAndUpdate(
-      collections.modules,
-      mainModuleQuery,
-      updationData
-    );
-    if (result) {
-      console.log("Module Updated Successfully.");
-      return res.status(200).json("Module Updated Successfully.");
-    } else {
+    let result = await mongo.findOneAndUpdate(collections.modules, mainModuleQuery, updationData);
+    //if submodule is added to the main module
+    if (!_.isEmpty(result)) { 
+      console.log({ ...result, module_code: module_code });
+      return res.status(200).json({ ...result, module_code: module_code });
+    } else { //if the submodule is not added to main module
       console.log("Main Module not found. Enter a valid main Module.");
-      return res
-        .status(400)
-        .json({ message: "Main Module not found. Enter a valid main Module." });
+      return res.status(400).json({ message: "Main Module not found. Enter a valid main Module." });
     }
-  } else {
+  } else { //if its not a main or sub module type
     console.log("Invalid Module type.");
     return res.status(400).json({ message: "Invalid Module type." });
   }

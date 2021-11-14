@@ -4,6 +4,8 @@ const role_modules_mapping = {
   "RootManager_lwvOH8Qvqy": ["module1A_9nhxVngR9U","submoduleXYZ_Ac1WNvaICb","emenucard_Mf9eyDrYZL"],
   //Restaurant users
   "ShopManager_uao8RNiWUy": ["emenucard_Mf9eyDrYZL"],
+  //Restaurant Customers
+  "ShopABCCustomer_a6aYeCKPj6":["emenucard_Mf9eyDrYZL"],
 };
 
 const module_content_mapping = {
