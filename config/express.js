@@ -4,10 +4,12 @@ const express = require("express");
 const session = require("express-session");
 const flash = require("connect-flash");
 const compression = require("compression");
+const cors = require("cors");
 
 exports.config = (app) => {
   //Preventing CORS errors
   //to Run Client and Server on different Systems
+  app.use(cors())
   app.use((req, res, next) => {
     res.setHeader("Content-Type", "application/json");
     res.header("Access-Control-Allow-Origin", "*");

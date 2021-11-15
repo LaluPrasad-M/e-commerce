@@ -7,10 +7,9 @@ const custom_mappings = require("../../data/custom_data/mappings/custom_mapping"
 
 exports.get_module_contents = async function (req, res) {
   let { module_code } = req.params;
-
   //get list of module_content_codes of all module_contents mapped to the module
   let module_content_code = custom_mappings.module_content_mapping[module_code];
-  if (_.isEmpty(module_content_code)) {
+  if (!_.isEmpty(module_content_code)) {
     let query = { module_content_code: module_content_code };
     //get contents of the module
     let result = await mongo.findOne(collections.module_contents, query);
