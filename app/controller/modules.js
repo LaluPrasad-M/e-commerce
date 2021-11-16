@@ -18,6 +18,9 @@ exports.getCustomerModules = async function (req, res) {
       let query = { "submodules.module_code": { $in: modules } };
       let result = await mongo.find(collections.modules, query);
       if (!_.isEmpty(result)) {
+        result.forEach(module => {
+          module.submodules =  module.submodules.filter(submodule => modules.includes(submodule.module_code));
+        })
         console.log(result);
         return res.status(200).json(result);
       }
@@ -37,6 +40,9 @@ exports.getUserModules = async function (req, res) {
     let query = { "submodules.module_code": { $in: modules } };
     let result = await mongo.find(collections.modules, query);
     if (!_.isEmpty(result)) {
+      result.forEach(module => {
+        module.submodules =  module.submodules.filter(submodule => modules.includes(submodule.module_code));
+      })
       console.log(result);
       return res.status(200).json(result);
     }
@@ -83,7 +89,7 @@ exports.postModules = async function (req, res) {
     };
     let result = await mongo.findOneAndUpdate(collections.modules, mainModuleQuery, updationData);
     //if submodule is added to the main module
-    if (!_.isEmpty(result)) { 
+    if (!_.isEmpty(result)) {
       console.log({ ...result, module_code: module_code });
       return res.status(200).json({ ...result, module_code: module_code });
     } else { //if the submodule is not added to main module
