@@ -16,11 +16,9 @@ exports.getCustomerModules = async function (req, res) {
     let modules = custom_mappings.role_modules_mapping[role_code];
     if (!_.isEmpty(modules)) {
       let query = { "submodules.module_code": { $in: modules } };
-      let result = await mongo.find(collections.modules, query);
+      let projection = { submodules: { $elemMatch: { module_code: { $in: modules } } } };
+      let result = await mongo.find(collections.modules, query, projection);
       if (!_.isEmpty(result)) {
-        result.forEach(module => {
-          module.submodules =  module.submodules.filter(submodule => modules.includes(submodule.module_code));
-        })
         console.log(result);
         return res.status(200).json(result);
       }
@@ -38,11 +36,9 @@ exports.getUserModules = async function (req, res) {
   let modules = custom_mappings.role_modules_mapping[user_role];
   if (!_.isEmpty(modules)) {
     let query = { "submodules.module_code": { $in: modules } };
-    let result = await mongo.find(collections.modules, query);
+    let projection = { submodules: { $elemMatch: { module_code: { $in: modules } } } };
+    let result = await mongo.find(collections.modules, query, projection);
     if (!_.isEmpty(result)) {
-      result.forEach(module => {
-        module.submodules =  module.submodules.filter(submodule => modules.includes(submodule.module_code));
-      })
       console.log(result);
       return res.status(200).json(result);
     }
