@@ -1,5 +1,3 @@
-const _ = require("lodash");
-
 const mongo = require("../utils/mongo");
 const commonUtils = require("../utils/commonUtils");
 const collections = require("../../data/collections");

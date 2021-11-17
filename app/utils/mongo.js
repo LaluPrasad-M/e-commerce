@@ -1,3 +1,4 @@
+const _ = require("lodash");
 const { MongoClient, ObjectID } = require("mongodb");
 const { MONGODB_URL, DB_1 } = require("../../config/mongoConfig");
 
@@ -6,13 +7,17 @@ const db = client.db(DB_1);
 
 exports.ObjectId = ObjectID;
 
-exports.findOne = async (collection, query) => {
+exports.findOne = async (collection, query, options) => {
   try {
-    if (!query) {
+    if (_.isEmpty(query)) {
       query = {};
     }
+    if (_.isEmpty(options)) {
+      options = {}
+    }
     await client.connect();
-    let result = await db.collection(collection).findOne(query);
+    let result = await db.collection(collection).findOne(query, options);
+    console.log(result);
     return result;
   } catch (e) {
     console.log(e.message);
@@ -22,20 +27,16 @@ exports.findOne = async (collection, query) => {
   }
 };
 
-exports.find = async (collection, query, projection) => {
+exports.find = async (collection, query, options) => {
   try {
-    if (!query) {
+    if (_.isEmpty(query)) {
       query = {};
     }
-    if (!projection) {
-      projection = {};
+    if (_.isEmpty(options)) {
+      options = {}
     }
     await client.connect();
-    let result = await db
-      .collection(collection)
-      .find(query)
-      .project(projection)
-      .toArray();
+    let result = await db.collection(collection).find(query, options).toArray();
     console.log(result);
     return result;
   } catch (e) {
@@ -48,17 +49,15 @@ exports.find = async (collection, query, projection) => {
 
 exports.findOneAndUpdate = async (collection, filterQuery, data, callback) => {
   try {
-    if (!filterQuery) {
+    if (_.isEmpty(filterQuery)) {
       console.log("Nothing Updated");
       return null;
     }
-    if (!callback) {
+    if (_.isEmpty(callback)) {
       callback = {};
     }
     await client.connect();
-    let result = await db
-      .collection(collection)
-      .findOneAndUpdate(filterQuery, data, callback);
+    let result = await db.collection(collection).findOneAndUpdate(filterQuery, data, callback);
     return result.lastErrorObject.updatedExisting;
   } catch (e) {
     console.log(e.message);
@@ -70,19 +69,14 @@ exports.findOneAndUpdate = async (collection, filterQuery, data, callback) => {
 
 exports.insertOne = async (collection, data) => {
   try {
-    if (!data) {
+    if (_.isEmpty(data)) {
       console.log("Nothing inserted");
       return null;
     }
     await client.connect();
     let result = await db.collection(collection).insertOne(data);
-    if (result) {
-      console.log(result);
-      return result;
-    } else {
-      console.log("Nothing Found", query);
-      return null;
-    }
+    console.log(result);
+    return result;
   } catch (e) {
     console.log(e.message);
     return null;
@@ -93,19 +87,14 @@ exports.insertOne = async (collection, data) => {
 
 exports.insertMany = async (collection, data) => {
   try {
-    if (!data) {
+    if (_.isEmpty(data)) {
       console.log("Nothing inserted");
       return [];
     }
     await client.connect();
-    const insertData = await db.collection(collection).insertMany(data);
-    if (insertData.insertedCount > 0) {
-      console.log(insertData);
-      return insertData;
-    } else {
-      console.log("Nothing inserted");
-      return [];
-    }
+    const result = await db.collection(collection).insertMany(data);
+    console.log(result);
+    return result;
   } catch (e) {
     console.log(e.message);
     return [];
@@ -116,21 +105,14 @@ exports.insertMany = async (collection, data) => {
 
 exports.update = async (collection, query, data) => {
   try {
-    if (!query || !data) {
+    if (_.isEmpty(query) || _.isEmpty(data)) {
       console.log("Nothing Updated");
       return [];
     }
     await client.connect();
-    let result = await db
-      .collection(collection)
-      .updateOne(query, { $set: data });
-    if (result) {
-      console.log(result);
-      return result;
-    } else {
-      console.log("Nothing Updated");
-      return [];
-    }
+    let result = await db.collection(collection).updateOne(query, { $set: data });
+    console.log(result);
+    return result;
   } catch (e) {
     console.log(e.message);
     return [];
@@ -141,18 +123,13 @@ exports.update = async (collection, query, data) => {
 
 exports.deleteOne = async (collection, query) => {
   try {
-    if (!query) {
+    if (_.isEmpty(data)) {
       query = {};
     }
     await client.connect();
     let result = await db.collection(collection).deleteOne(query);
-    if (result) {
-      console.log(result);
-      return result;
-    } else {
-      console.log("Nothing deleted");
-      return [];
-    }
+    console.log(result);
+    return result;
   } catch (e) {
     console.log(e.message);
     return [];
@@ -163,18 +140,13 @@ exports.deleteOne = async (collection, query) => {
 
 exports.deleteMany = async (collection, query) => {
   try {
-    if (!query) {
+    if (_.isEmpty(query)) {
       query = {};
     }
     await client.connect();
     let result = await db.collection(collection).deleteMany(query);
-    if (result) {
-      console.log(result);
-      return result;
-    } else {
-      console.log("Nothing deleted");
-      return [];
-    }
+    console.log(result);
+    return result;
   } catch (e) {
     console.log(e.message);
     return [];

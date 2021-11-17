@@ -16,8 +16,10 @@ exports.getCustomerModules = async function (req, res) {
     let modules = custom_mappings.role_modules_mapping[role_code];
     if (!_.isEmpty(modules)) {
       let query = { "submodules.module_code": { $in: modules } };
-      let projection = { name: 1, module_code: 1, submodules: { $elemMatch: { module_code: { $in: modules } } } };
-      let result = await mongo.find(collections.modules, query, projection);
+      let options = {
+        projection: { name: 1, module_code: 1, submodules: { $elemMatch: { module_code: { $in: modules } } } }
+      };
+      let result = await mongo.find(collections.modules, query, options);
       if (!_.isEmpty(result)) {
         console.log(result);
         return res.status(200).json(result);
@@ -36,8 +38,10 @@ exports.getUserModules = async function (req, res) {
   let modules = custom_mappings.role_modules_mapping[user_role];
   if (!_.isEmpty(modules)) {
     let query = { "submodules.module_code": { $in: modules } };
-    let projection = { name: 1, module_code: 1, submodules: { $elemMatch: { module_code: { $in: modules } } } };
-    let result = await mongo.find(collections.modules, query, projection);
+    let options = {
+      projection: { name: 1, module_code: 1, submodules: { $elemMatch: { module_code: { $in: modules } } } }
+    };
+    let result = await mongo.find(collections.modules, query, options);
     if (!_.isEmpty(result)) {
       console.log(result);
       return res.status(200).json(result);
@@ -117,11 +121,7 @@ exports.getModuleDetails = async function (req, res) {
 //   let modulesToEnable = req.body.enable || [];
 //   let modulesToDisable = req.body.disable || [];
 //   let result = "";
-//   let commonElements = await commonUtils.getArraysIntersection(
-//     modulesToEnable,
-//     modulesToDisable
-//   );
-//   if (!commonElements.length) {
+//   if (_.isEmpty(_.intersection(modulesToEnable, modulesToDisable))) {
 //     if (modulesToEnable.length) {
 //       let data = {
 //         $addToSet: {

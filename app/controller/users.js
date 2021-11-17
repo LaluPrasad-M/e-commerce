@@ -58,26 +58,20 @@ exports.postLogin = async (req, res) => {
     let { email, password } = req.body;
     if (!_.isEmpty(email) && !_.isEmpty(password)) {
       //get the user with the given email
-      const user = await mongo.findOne(collections.users, { email: email });
+      let options = {
+        projection: { _id: 0 }
+      }
+      const user = await mongo.findOne(collections.users, { email: email }, options);
       if (!_.isEmpty(user)) {
-        //tokenQuery stores the userData into token to utilise it later
-        let tokenQuery = {
-          user_code: user.user_code,
-          name: user.name,
-          email: user.email,
-          phone: user.phone,
-          dob: user.dob,
-          role_code: user.role_code,
-          manager: user.manager,
-        };
-
         //validate the password and get the token
-        let token = await authentication.generateSessionToken(password, user.password, tokenQuery);
+        hashPassword = user.password;
+        delete user.password
+        let token = await authentication.generateSessionToken(password, hashPassword, user);
         if (!_.isEmpty(token)) {
           //store the token in the session
           await req.flash("token", token);
 
-          console.log(tokenQuery)
+          console.log(token)
           return res.status(200).json({ token });
         }
       }

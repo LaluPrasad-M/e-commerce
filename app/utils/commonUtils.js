@@ -15,9 +15,3 @@ exports.makeId = (length, startString) => {
   }
   return result;
 };
-
-exports.getArraysIntersection = (array1, array2) => {
-  return array1.filter((element) => {
-    return array2.indexOf(element) !== -1;
-  });
-};
