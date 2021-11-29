@@ -6,6 +6,10 @@ const flash = require("connect-flash");
 const compression = require("compression");
 const cors = require("cors");
 
+const log4js = require("log4js");
+const log_error = log4js.getLogger("error");
+const log_info = log4js.getLogger("info");
+
 exports.config = (app) => {
   //Preventing CORS errors
   //to Run Client and Server on different Systems
@@ -54,23 +58,31 @@ exports.config = (app) => {
   app.use(express.urlencoded({ extended: false }));
   app.use(express.json());
 
-  return app;
+  //to enter a log in log file about the incoming request
+  app.use((req, res, next) => {
+    var fullUrl = req.method + ": " + req.protocol + '://' + req.get('host') + req.originalUrl + ", BODY: " + JSON.stringify(req.body);
+    log_info.trace(fullUrl)
+    next()
+  });
 };
 
-exports.NotFoundError = (app) => {
+exports.ErrorHandler = (app) => {
   //Handling Errors
   app.use((req, res, next) => {
     const error = new Error("Url Not Found! Invalid URL!");
     error.status = 404;
     next(error);
   });
+
   app.use((error, req, res, next) => {
+    let fullUrl = req.method + ": " + req.protocol + '://' + req.get('host') + req.originalUrl + ", BODY: " + JSON.stringify(req.body);
+    log_error.off(fullUrl)
+    log_error.error(error)
+
     res.status(error.status || 500);
     res.json({
-      error: {
-        message: error.message,
-      },
+      success: false,
+      message: error.message,
     });
   });
-  return app;
 };
