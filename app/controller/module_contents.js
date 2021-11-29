@@ -1,6 +1,6 @@
 const _ = require("lodash");
 
-const mongo = require("../utils/mongo");
+const db = require("../../config/mongo");
 const collections = require("../../data/collections");
 const commonUtils = require("../utils/commonUtils");
 const custom_mappings = require("../../data/custom_data/mappings/custom_mapping");
@@ -12,7 +12,7 @@ exports.get_module_contents = async function (req, res) {
   if (!_.isEmpty(module_content_code)) {
     let query = { module_content_code: module_content_code };
     //get contents of the module
-    let result = await mongo.findOne(collections.module_contents, query);
+    let result = await db.getDb().db().collection(collections.module_contents).findOne(query);
     if (!_.isEmpty(result)) {
       console.log(result);
       return res.status(200).json(result);
@@ -39,7 +39,7 @@ exports.post_module_contents = async function (req, res) {
     ...data,
     module_content_code: commonUtils.makeId(10, data.module_content_name),
   };
-  let result = mongo.insertOne(collections.module_contents, dataQuery);
+  let result = db.getDb().db().collection(collections.module_contents).insertOne(dataQuery);
   if (!_.isEmpty(result)) {
     console.log({ ...result, module_content_code: dataQuery.module_content_code });
     return res.status(200).json({ ...result, module_content_code: dataQuery.module_content_code });

@@ -1,9 +1,13 @@
 const _ = require("lodash");
+const log4js = require("log4js");
 
-const mongo = require("../utils/mongo");
+const db = require("../../config/mongo");
 const commonUtils = require("../utils/commonUtils");
 const collections = require("../../data/collections");
 const authentication = require("../utils/authentication");
+const { register_user_schema, login_user_schema, update_user_schema } = require("../models/user.model");
+
+const log_info = log4js.getLogger("info")
 
 /*
 {
@@ -16,34 +20,60 @@ const authentication = require("../utils/authentication");
   "role_code": "role_code"    ==> required
 }
 */
-exports.postSignup = async (req, res) => {
-  let data = req.body;
-  //check if a user already exists with the email
+exports.post_register_user = async (req, res, next) => {
+  try {
+    var { phone, dob } = req.body;
+    //validate the request body data
+    var { name, email, password, role_code, manager } = await register_user_schema.validate(req.body)
 
-  let userExists = await mongo.findOne(collections.users, { email: data.email });
-  if (!_.isEmpty(userExists)) {
-    console.log("User already exists! Please try Logging in");
-    return res.status(403).json({ message: "User already exists! Please try Logging in" });
-  }
+    //check if a user already exists with the email
+    let userExists = await db.getDb().db().collection(collections.users).findOne({ email });
+    if (!_.isEmpty(userExists)) {
+      var error = new Error("User already exists! Please try Logging in");
+      error.status = 409;
+      return next(error);
+    }
 
-  //check if the role_code is valid
-  let valid_role = await mongo.findOne(collections.roles, { role_code: data.role_code });
-  if (_.isEmpty(valid_role)) {
-    console.log("Invalid Role. Please enter a valid role code");
-    return res.status(403).json({ message: "Invalid Role. Please enter a valid role code" });
-  }
+    //check if the role_code is valid
+    let valid_role = await db.getDb().db().collection(collections.roles).findOne({ role_code });
+    if (_.isEmpty(valid_role)) {
+      var error = new Error("Invalid Role. Please enter a valid role code");
+      error.status = 400;
+      return next(error);
+    }
 
-  data["user_code"] = await commonUtils.makeId(10, data.email);
-  data["password"] = await authentication.hash(data.password);
+    //check if the manger is valid
+    if (!_.isEmpty(manager)) {
+      let valid_manager = await db.getDb().db().collection(collections.users).findOne({ user_code: manager });
+      if (_.isEmpty(valid_manager)) {
+        var error = new Error("Invalid Manager. PLease enter a valid manager data");
+        error.status = 400;
+        return next(error);
+      }
+    } else {
+      manager = null
+    }
 
-  //insert the data into database
-  let result = await mongo.insertOne(collections.users, data);
-  if (!_.isEmpty(result)) {
-    console.log({ ...result, user_code: data.user_code });
-    return res.status(200).json({ ...result, user_code: data.user_code });
-  } else {
-    console.log("Nothing Inserted. Please try again later");
-    return res.status(500).json({ message: "Nothing Inserted. Please try again later" });
+
+    let user_code = await commonUtils.makeId(10, email);
+    let salt = await authentication.genSalt(15);
+    let hashed_password = await authentication.hash(salt, password);
+    let created_on = new Date();
+
+    //insert the data into database
+    let data = { user_code, name, email, phone, dob, manager, role_code, salt, hashed_password, created_on, last_login: created_on, last_updated_on: created_on }
+    let result = await db.getDb().db().collection(collections.users).insertOne(data);
+
+    if (!_.isEmpty(JSON.json_stringify(result.insertedId))) {
+      let token = await authentication.generateSessionToken(password, hashed_password, { user_code, email })
+      return res.status(201).json({ success: true, token });
+    } else {
+      var error = new Error("Nothing Inserted. Please try again later");
+      error.status = 500;
+      return next(error);
+    }
+  } catch (err) {
+    next(err);
   }
 };
 
@@ -53,65 +83,82 @@ exports.postSignup = async (req, res) => {
   "password":"password"
 }
 */
-exports.postLogin = async (req, res) => {
+exports.post_login_user = async (req, res, next) => {
   try {
-    let { email, password } = req.body;
-    if (!_.isEmpty(email) && !_.isEmpty(password)) {
-      //get the user with the given email
-      let options = {
-        projection: { _id: 0 }
-      }
-      const user = await mongo.findOne(collections.users, { email: email }, options);
-      if (!_.isEmpty(user)) {
-        //validate the password and get the token
-        hashPassword = user.password;
-        delete user.password
-        let token = await authentication.generateSessionToken(password, hashPassword, user);
-        if (!_.isEmpty(token)) {
-          //store the token in the session
-          await req.flash("token", token);
+    let { email, password } = await login_user_schema.validate(req.body);
+    const user = await db.getDb().db().collection(collections.users).findOne({ email });
+    if (!_.isEmpty(user)) {
+      let { user_code, hashed_password } = user;
+      let token = await authentication.generateSessionToken(password, hashed_password, { user_code, email });
 
-          console.log(token)
-          return res.status(200).json({ token });
-        }
-      }
+      await db.getDb().db().collection(collections.users).updateOne({ user_code }, { $set: { last_login: new Date() } })
+      await req.flash("token", token);
+      return res.status(200).json({ success: true, token });
     }
-    console.log("Authentication Failed! Please check you email and password.");
-    return res.status(401).json({ message: "Authentication Failed! Please check you email and password.", });
-  } catch (e) {
-    console.log("Session Expired. Please login again");
-    return res.status(401).json({ message: "Session Expired. Please login again" });
+    var error = new Error("Authentication Failed! Please check you email and password.");
+    error.status = 401
+    return next(error)
+  } catch (err) {
+    next(err);
   }
 };
 
-exports.postLogout = async (req, res) => {
-  //remove the token from session
-  req.flash("token");
+exports.post_logout_user = async (req, res, next) => {
+  try {
+    await db.getDb().db().collection(collections.users).updateOne({ user_code: req.user.user_code }, { $set: { last_logout: new Date() } })
 
-  console.log("logged out successfully");
-  return res.status(200).json({ message: "logged out successfully" });
+    //remove the token from session
+    req.flash("token");
+
+    log_info.info("logged out successfully");
+    return res.status(200).json({ success: true, message: "logged out successfully" });
+  } catch (err) {
+    next(err);
+  }
 };
 
-exports.getUsers = async (req, res) => {
-  let result = await mongo.find(collections.users);
-  res.status(200).json(result);
+exports.get_users_list = async (req, res, next) => {
+  try {
+    let result = await db.getDb().db().collection(collections.users).find({}).toArray();
+    res.status(200).json({ success: true, data: result });
+  } catch (err) {
+    next(err);
+  }
 };
 
-exports.getUserDetails = async (req, res) => {
-  let query = { _id: mongo.ObjectId(req.params.id) };
-  let result = await mongo.findOne(collections.users, query);
-  res.status(200).json(result);
+exports.get_user_profile = async (req, res, next) => {
+  try {
+    let profile = req.user;
+    res.status(200).json({ success: true, data: profile });
+  } catch (err) {
+    next(err);
+  }
 };
 
-exports.updateUsers = async (req, res) => {
-  let query = { _id: mongo.ObjectId(req.params.id) };
-  let data = req.body;
-  let result = await mongo.update(collections.users, query, data);
-  res.status(200).json(result);
-};
+exports.update_user_profile = async (req, res, next) => {
+  try {
+    let user_code = req.user.user_code;
+    var { name, email, phone, dob } = await update_user_schema.validate(req.body)
+    let data = { name, email, phone, dob }
 
-exports.deleteUser = async (req, res) => {
-  let query = { _id: mongo.ObjectId(req.params.id) };
-  let result = await mongo.deleteOne(collections.users, query);
-  res.status(200).json(result);
+    //check if a user already exists with the email
+    if (req.user.email !== email) {
+      let userExists = await db.getDb().db().collection(collections.users).findOne({ email });
+      if (!_.isEmpty(userExists)) {
+        var error = new Error("User already exists! Please try Logging in");
+        error.status = 409;
+        return next(error);
+      }
+    }
+
+    let updation_result = await db.getDb().db().collection(collections.users).updateOne({ user_code }, { $set: data })
+    if (updation_result.modifiedCount) {
+      await db.getDb().db().collection(collections.users).updateOne({ user_code }, { $set: { last_updated_on: new Date() } })
+    }
+
+    var result = updation_result.modifiedCount ? "Data Updated" : updation_result.matchedCount ? "Nothing modified" : "Please login again";
+    res.status(200).json({ success: true, data: result });
+  } catch (err) {
+    next(err);
+  }
 };

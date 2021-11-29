@@ -1,8 +1,8 @@
-const mongo = require("../utils/mongo");
+const db = require("../../config/mongo");
 const collections = require("../../data/collections");
 
 exports.postAdd = async (req, res) => {
-  let userData = req.userData || req.body;
+  let userData = req.user || req.body;
   if (!userData.role || !userData.companyId) {
     return res.status(403).json({ message: "Invalid User Login." });
   }
@@ -22,8 +22,7 @@ exports.postAdd = async (req, res) => {
     updationData["$set"].canCreateCustomer = data.canCreateCustomer;
   }
 
-  let result = await mongo.findOneAndUpdate(
-    collections.permissions,
+  let result = await db.getDb().db().collection(collections.permissions).findOneAndUpdate(
     filterQuery,
     updationData,
     { upsert: true }
@@ -38,7 +37,7 @@ exports.postAdd = async (req, res) => {
 };
 
 exports.postRevoke = async (req, res) => {
-  let userData = req.userData || req.body;
+  let userData = req.user || req.body;
   if (!userData.role || !userData.companyId) {
     return res.status(403).json({ message: "Invalid User Login." });
   }
@@ -58,8 +57,7 @@ exports.postRevoke = async (req, res) => {
     updationData["$set"].canCreateCustomer = data.canCreateCustomer;
   }
 
-  let result = await mongo.findOneAndUpdate(
-    collections.permissions,
+  let result = await db.getDb().db().collection(collections.permissions).findOneAndUpdate(
     filterQuery,
     updationData
   );
@@ -73,12 +71,12 @@ exports.postRevoke = async (req, res) => {
 };
 
 exports.getPermission = async (req, res) => {
-  let userData = req.userData || req.body;
+  let userData = req.user || req.body;
   if (!userData.role || !userData.companyId) {
     return res.status(403).json({ message: "Invalid User Login." });
   }
   let query = { role: userData.role, companyId: userData.companyId };
-  let result = await mongo.findOne(collections.permissions, query);
+  let result = await db.getDb().db().collection(collections.permissions).findOne(query);
   if (result) {
     return res.status(200).json(result);
   } else {
@@ -87,7 +85,7 @@ exports.getPermission = async (req, res) => {
 };
 
 exports.getAllPermissions = async (req, res) => {
-  let result = await mongo.find(collections.permissions);
+  let result = await db.getDb().db().collection(collections.permissions).find({}).toArray();
   if (result) {
     return res.status(200).json(result);
   } else {

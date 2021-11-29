@@ -1,6 +1,6 @@
 const _ = require("lodash");
 
-const mongo = require("../utils/mongo");
+const db = require("../../config/mongo");
 const collections = require("../../data/collections");
 const commonUtils = require("../utils/commonUtils");
 const custom_mappings = require("../../data/custom_data/mappings/custom_mapping");
@@ -8,7 +8,7 @@ const custom_mappings = require("../../data/custom_data/mappings/custom_mapping"
 //For Customers, these roles doesnt require login
 exports.getCustomerModules = async function (req, res) {
   let { role_code } = req.params;
-  var role_details = await mongo.findOne(collections.roles, { role_code: role_code });
+  var role_details = await db.getDb().db().collection(collections.roles).findOne({ role_code: role_code });
 
   //check if the role required a login
   if (!_.isEmpty(role_details) && !role_details.requires_login) {
@@ -19,7 +19,7 @@ exports.getCustomerModules = async function (req, res) {
       let options = {
         projection: { name: 1, module_code: 1, submodules: { $elemMatch: { module_code: { $in: modules } } } }
       };
-      let result = await mongo.find(collections.modules, query, options);
+      let result = await db.getDb().db().collection(collections.modules).find(query, options).toArray();
       if (!_.isEmpty(result)) {
         console.log(result);
         return res.status(200).json(result);
@@ -32,7 +32,7 @@ exports.getCustomerModules = async function (req, res) {
 
 //For Authorized Users, these roles require login
 exports.getUserModules = async function (req, res) {
-  let user_role = req.userData.role_code;
+  let user_role = req.user.role_code;
 
   //get list of module_codes of all modules mapped to the role
   let modules = custom_mappings.role_modules_mapping[user_role];
@@ -41,7 +41,7 @@ exports.getUserModules = async function (req, res) {
     let options = {
       projection: { name: 1, module_code: 1, submodules: { $elemMatch: { module_code: { $in: modules } } } }
     };
-    let result = await mongo.find(collections.modules, query, options);
+    let result = await db.getDb().db().collection(collections.modules).find(query, options).toArray();
     if (!_.isEmpty(result)) {
       console.log(result);
       return res.status(200).json(result);
@@ -72,7 +72,7 @@ exports.postModules = async function (req, res) {
       name: data.name,
       submodules: [],
     };
-    let result = await mongo.insertOne(collections.modules, insertData);
+    let result = await db.getDb().db().collection(collections.modules).insertOne(insertData);
     return res.status(200).json({ ...result, module_code: insertData.module_code });
   } else if (data.type === moduleTypes.sub) { //if its a sub module
     let mainModuleQuery = { module_code: req.body.main_module };
@@ -87,7 +87,7 @@ exports.postModules = async function (req, res) {
         },
       },
     };
-    let result = await mongo.findOneAndUpdate(collections.modules, mainModuleQuery, updationData);
+    let result = await db.getDb().db().collection(collections.modules).findOneAndUpdate(mainModuleQuery, updationData);
     //if submodule is added to the main module
     if (!_.isEmpty(result)) {
       console.log({ ...result, module_code: module_code });
@@ -102,11 +102,11 @@ exports.postModules = async function (req, res) {
   }
 };
 
-exports.getModuleDetails = async function (req, res) {
-  let query = { _id: mongo.ObjectId(req.params.id) };
-  let result = await mongo.findOne(collections.modules, query);
-  res.status(200).json(result);
-};
+// exports.getModuleDetails = async function (req, res) {
+//   let query = { _id: mongo.ObjectId(req.params.id) };
+//   let result = await mongo.findOne(collections.modules, query);
+//   res.status(200).json(result);
+// };
 
 // /*
 // /:module_code
@@ -168,8 +168,8 @@ exports.getModuleDetails = async function (req, res) {
 //   }
 // };
 
-exports.deleteModule = async function (req, res) {
-  let query = { _id: mongo.ObjectId(req.params.id) };
-  let result = await mongo.deleteOne(collections.modules, query);
-  res.status(200).json(result);
-};
+// exports.deleteModule = async function (req, res) {
+//   let query = { _id: mongo.ObjectId(req.params.id) };
+//   let result = await mongo.deleteOne(collections.modules, query);
+//   res.status(200).json(result);
+// };

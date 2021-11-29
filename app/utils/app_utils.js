@@ -12,7 +12,7 @@ exports.walkRoutes = (path, app, fileNameRegex, skipFile) => {
           router(app);
         }
       }
-    } else if (stat.isDirectory() && file !== skipFile) {
+    } else if (stat.isDirectory() && file !== "middlewares" && file !== skipFile) {
       exports.walkRoutes(newPath, app, fileNameRegex, skipFile);
     }
   });

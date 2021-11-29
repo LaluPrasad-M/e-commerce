@@ -3,8 +3,11 @@ const jwt = require("jsonwebtoken");
 
 const { JWT_KEY } = require("../../config/authenticationConfig");
 
-exports.hash = async (password) => {
-  const salt = 10;
+exports.genSalt = async size => {
+  return await bcrypt.genSalt(size);
+}
+exports.hash = async (salt, password) => {
+  console.log(salt)
   return await bcrypt.hash(password, salt);
 };
 
@@ -22,33 +25,11 @@ exports.generateSessionToken = async (
       });
       return token;
     } else {
-      console.log("wrong Password");
-      return null;
+      let error = new Error("Wrong Password");
+      error.status = 401;
+      throw error;
     }
   } catch (error) {
-    console.log(error);
-    return null;
-  }
-};
-
-exports.checkAuth = (req, res, next) => {
-  try {
-    const token =
-      req.query.token ||
-      req.body.token ||
-      req.headers["x-access-token"] ||
-      req.flash("token")[0];
-    if (token) {
-      req.flash("token", token);
-      const decoded = jwt.verify(token, JWT_KEY);
-      req.userData = decoded;
-      next();
-    } else {
-      return res.json({ message: "Please login" });
-    }
-  } catch (error) {
-    res.status(401);
-    console.log(error);
-    res.json({ message: "Invalid User!" });
+    throw error
   }
 };

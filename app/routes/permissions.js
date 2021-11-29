@@ -1,9 +1,9 @@
-const { checkAuth } = require("../utils/authentication");
+const { check_authentication } = require("./middlewares/authorization");
 const permissionController = require("../controller/permissions");
 
 module.exports = (app) => {
-  app.post("/add", checkAuth, permissionController.postAdd);
-  app.post("/revoke", checkAuth, permissionController.postRevoke);
-  app.get("/", checkAuth, permissionController.getPermission);
-  app.get("/all", checkAuth, permissionController.getAllPermissions);
+  app.post("/add", check_authentication, permissionController.postAdd);
+  app.post("/revoke", check_authentication, permissionController.postRevoke);
+  app.get("/", check_authentication, permissionController.getPermission);
+  app.get("/all", check_authentication, permissionController.getAllPermissions);
 };
