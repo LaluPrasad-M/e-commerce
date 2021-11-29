@@ -66,6 +66,7 @@ exports.post_register_user = async (req, res, next) => {
 
     if (!_.isEmpty(JSON.json_stringify(result.insertedId))) {
       let token = await authentication.generateSessionToken(password, hashed_password, { user_code, email })
+      log_info.info({ success: true, token })
       return res.status(201).json({ success: true, token });
     } else {
       var error = new Error("Nothing Inserted. Please try again later");
@@ -93,6 +94,7 @@ exports.post_login_user = async (req, res, next) => {
 
       await db.getDb().db().collection(collections.users).updateOne({ user_code }, { $set: { last_login: new Date() } })
       await req.flash("token", token);
+      log_info.info({ success: true, token })
       return res.status(200).json({ success: true, token });
     }
     var error = new Error("Authentication Failed! Please check you email and password.");
@@ -110,7 +112,7 @@ exports.post_logout_user = async (req, res, next) => {
     //remove the token from session
     req.flash("token");
 
-    log_info.info("logged out successfully");
+    log_info.info({ success: true, message: "logged out successfully" });
     return res.status(200).json({ success: true, message: "logged out successfully" });
   } catch (err) {
     next(err);
@@ -120,6 +122,7 @@ exports.post_logout_user = async (req, res, next) => {
 exports.get_users_list = async (req, res, next) => {
   try {
     let result = await db.getDb().db().collection(collections.users).find({}).toArray();
+    log_info.info({ success: true, result })
     res.status(200).json({ success: true, data: result });
   } catch (err) {
     next(err);
@@ -129,6 +132,7 @@ exports.get_users_list = async (req, res, next) => {
 exports.get_user_profile = async (req, res, next) => {
   try {
     let profile = req.user;
+    log_info.info({ success: true, profile })
     res.status(200).json({ success: true, data: profile });
   } catch (err) {
     next(err);
@@ -157,6 +161,7 @@ exports.update_user_profile = async (req, res, next) => {
     }
 
     var result = updation_result.modifiedCount ? "Data Updated" : updation_result.matchedCount ? "Nothing modified" : "Please login again";
+    log_info.info({ success: true, result })
     res.status(200).json({ success: true, data: result });
   } catch (err) {
     next(err);
