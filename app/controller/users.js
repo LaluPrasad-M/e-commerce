@@ -139,6 +139,15 @@ exports.get_user_profile = async (req, res, next) => {
   }
 };
 
+
+/*
+{
+  "name": "user name",    ==> required
+  "email": "user.mail@email.com", ==> required
+  "phone": "+919876543210",
+  "dob": "01-01-2000",
+}
+*/
 exports.update_user_profile = async (req, res, next) => {
   try {
     let user_code = req.user.user_code;
