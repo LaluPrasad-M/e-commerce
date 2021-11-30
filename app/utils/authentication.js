@@ -21,7 +21,7 @@ exports.generateSessionToken = async (
     let result = await bcrypt.compare(reqBodyPassword, userPasswordToken);
     if (result) {
       const token = jwt.sign(tokenQuery, JWT_KEY, {
-        expiresIn: "1h",
+        expiresIn: "3h",
       });
       return token;
     } else {

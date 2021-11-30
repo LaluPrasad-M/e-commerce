@@ -159,13 +159,20 @@ exports.update_user_profile = async (req, res, next) => {
     }
 
     let updation_result = await db.getDb().db().collection(collections.users).updateOne({ user_code }, { $set: data })
+
     if (updation_result.modifiedCount) {
       await db.getDb().db().collection(collections.users).updateOne({ user_code }, { $set: { last_updated_on: new Date() } })
+      log_info.info({ success: true, data: "Data Updated" })
+      return res.status(200).json({ success: true, data: "Data Updated" });
     }
 
-    var result = updation_result.modifiedCount ? "Data Updated" : updation_result.matchedCount ? "Nothing modified" : "Please login again";
-    log_info.info({ success: true, result })
-    res.status(200).json({ success: true, data: result });
+    if (updation_result.matchedCount) {
+      var error = new Error("Nothing Modified")
+      error.status = 304;
+      throw error
+    } else {
+      throw new Error("Please re-login and retry")
+    }
   } catch (err) {
     next(err);
   }

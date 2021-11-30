@@ -19,7 +19,7 @@ exports.postRoles = async function (req, res, next) {
   try {
     let data = {
       ...req.body,
-      role_code: await commonUtils.makeId(10, data.role_name),
+      role_code: await commonUtils.makeId(10, req.body.role_name),
       created_on: new Date(),
       last_updated_on: new Date()
     }

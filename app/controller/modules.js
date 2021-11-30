@@ -1,19 +1,50 @@
 const _ = require("lodash");
+const log4js = require("log4js");
 
 const db = require("../../config/mongo");
 const collections = require("../../data/collections");
 const commonUtils = require("../utils/commonUtils");
 const custom_mappings = require("../../data/custom_data/mappings/custom_mapping");
 
-//For Customers, these roles doesnt require login
-exports.getCustomerModules = async function (req, res) {
-  let { role_code } = req.params;
-  var role_details = await db.getDb().db().collection(collections.roles).findOne({ role_code: role_code });
+const log_info = log4js.getLogger("info")
 
-  //check if the role required a login
-  if (!_.isEmpty(role_details) && !role_details.requires_login) {
+//For Customers, these roles doesnt require login
+exports.get_customer_modules = async function (req, res, err) {
+  try {
+    let { role_code } = req.params;
+    var role_details = await db.getDb().db().collection(collections.roles).findOne({ role_code: role_code });
+
+    //check if the role requires a login
+    if (!_.isEmpty(role_details) && !role_details.requires_login) {
+      //get list of module_codes of all modules mapped to the role
+      let modules = custom_mappings.role_modules_mapping[role_code];
+      if (!_.isEmpty(modules)) {
+        let query = { "submodules.module_code": { $in: modules } };
+        let options = {
+          projection: { name: 1, module_code: 1, submodules: { $elemMatch: { module_code: { $in: modules } } } }
+        };
+        let result = await db.getDb().db().collection(collections.modules).find(query, options).toArray();
+        if (!_.isEmpty(result)) {
+          log_info.info({ success: true, data: result })
+          return res.status(200).json({ success: true, data: result });
+        }
+      }
+    }
+    let error = new Error("No Modules Found");
+    error.status = 404;
+    throw error;
+  } catch (err) {
+    next(err)
+  }
+};
+
+//For Authorized Users, these roles require login
+exports.get_user_modules = async function (req, res, next) {
+  try {
+    let user_role = req.user.role_code;
+
     //get list of module_codes of all modules mapped to the role
-    let modules = custom_mappings.role_modules_mapping[role_code];
+    let modules = custom_mappings.role_modules_mapping[user_role];
     if (!_.isEmpty(modules)) {
       let query = { "submodules.module_code": { $in: modules } };
       let options = {
@@ -21,36 +52,18 @@ exports.getCustomerModules = async function (req, res) {
       };
       let result = await db.getDb().db().collection(collections.modules).find(query, options).toArray();
       if (!_.isEmpty(result)) {
-        console.log(result);
-        return res.status(200).json(result);
+        log_info.info({ success: true, data: result })
+        return res.status(200).json({ success: true, data: result });
       }
     }
+    let error = new Error("No Modules Found");
+    error.status = 404;
+    throw error;
+  } catch (err) {
+    next(err);
   }
-  return res.status(500).json({ message: "No Modules found." });
 };
 
-
-//For Authorized Users, these roles require login
-exports.getUserModules = async function (req, res) {
-  let user_role = req.user.role_code;
-
-  //get list of module_codes of all modules mapped to the role
-  let modules = custom_mappings.role_modules_mapping[user_role];
-  if (!_.isEmpty(modules)) {
-    let query = { "submodules.module_code": { $in: modules } };
-    let options = {
-      projection: { name: 1, module_code: 1, submodules: { $elemMatch: { module_code: { $in: modules } } } }
-    };
-    let result = await db.getDb().db().collection(collections.modules).find(query, options).toArray();
-    if (!_.isEmpty(result)) {
-      console.log(result);
-      return res.status(200).json(result);
-    }
-  }
-  return res.status(500).json({ message: "No Modules found." });
-};
-
-let moduleTypes = { main: "main", sub: "sub" };
 
 /*
   {
@@ -63,42 +76,60 @@ let moduleTypes = { main: "main", sub: "sub" };
     "main_module": "main module code",
   }
 */
-exports.postModules = async function (req, res) {
-  let data = req.body;
-  //if its a main Module
-  if (data.type === moduleTypes.main) {
-    let insertData = {
-      module_code: commonUtils.makeId(10, data.name),
-      name: data.name,
-      submodules: [],
-    };
-    let result = await db.getDb().db().collection(collections.modules).insertOne(insertData);
-    return res.status(200).json({ ...result, module_code: insertData.module_code });
-  } else if (data.type === moduleTypes.sub) { //if its a sub module
-    let mainModuleQuery = { module_code: req.body.main_module };
-    let module_code = commonUtils.makeId(10, data.name);
+exports.post_modules = async function (req, res, next) {
+  try {
+    let data = req.body;
+    //if its a main Module
+    if (data.type === "main") {
+      let insertData = {
+        module_code: commonUtils.makeId(10, data.name),
+        name: data.name,
+        submodules: [],
+      };
+      let result = await db.getDb().db().collection(collections.modules).insertOne(insertData);
 
-    //add the submodule to the main_module
-    let updationData = {
-      $addToSet: {
-        submodules: {
-          module_code: module_code,
-          name: data.name,
-        },
-      },
-    };
-    let result = await db.getDb().db().collection(collections.modules).findOneAndUpdate(mainModuleQuery, updationData);
-    //if submodule is added to the main module
-    if (!_.isEmpty(result)) {
-      console.log({ ...result, module_code: module_code });
-      return res.status(200).json({ ...result, module_code: module_code });
-    } else { //if the submodule is not added to main module
-      console.log("Main Module not found. Enter a valid main Module.");
-      return res.status(400).json({ message: "Main Module not found. Enter a valid main Module." });
+      log_info.info({ success: true, data: "Module Inserted" })
+      return res.status(200).json({ success: true, data: "Module Inserted" });
+
+    } else { //if its a sub module
+
+      if (!data.main_module) {
+        const error = new Error("Main module cannot be empty");
+        error.status = 400;
+        throw error;
+      }
+
+      let main_module_query = { module_code: data.main_module };
+      let updation_query = {
+        $push: {
+          submodules: {
+            module_code: commonUtils.makeId(10, data.name),
+            name: data.name
+          }
+        }
+      };
+
+      let updation_result = await db.getDb().db().collection(collections.modules).updateOne(main_module_query, updation_query);
+      //if submodule is added to the main module
+
+      if (updation_result.modifiedCount) {
+        await db.getDb().db().collection(collections.modules).updateOne(main_module_query, { $set: { last_updated_on: new Date() } })
+        log_info.info({ success: true, data: "Module Inserted" })
+        return res.status(200).json({ success: true, data: "Module Inserted" });
+      }
+
+      if (updation_result.matchedCount) {
+        var error = new Error("Module not inserted")
+        error.status = 304;
+        throw error
+      } else {
+        var error = new Error("Main Module not found. Enter a valid main Module.")
+        error.status = 400;
+        throw error
+      }
     }
-  } else { //if its not a main or sub module type
-    console.log("Invalid Module type.");
-    return res.status(400).json({ message: "Invalid Module type." });
+  } catch (err) {
+    next(err)
   }
 };
 
