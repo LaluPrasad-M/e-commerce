@@ -9,7 +9,7 @@ const custom_mappings = require("../../data/custom_data/mappings/custom_mapping"
 const log_info = log4js.getLogger("info")
 
 //For Customers, these roles doesnt require login
-exports.get_customer_modules = async function (req, res, err) {
+exports.get_customer_modules = async function (req, res, next) {
   try {
     let { role_code } = req.params;
     var role_details = await db.getDb().db().collection(collections.roles).findOne({ role_code: role_code });
