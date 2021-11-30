@@ -28,7 +28,7 @@ exports.post_register_user = async (req, res, next) => {
     if (!_.isEmpty(userExists)) {
       var error = new Error("User already exists! Please try Logging in");
       error.status = 409;
-      return next(error);
+      throw error;
     }
 
     //check if the role_code is valid
@@ -36,7 +36,7 @@ exports.post_register_user = async (req, res, next) => {
     if (_.isEmpty(valid_role)) {
       var error = new Error("Invalid Role. Please enter a valid role code");
       error.status = 400;
-      return next(error);
+      throw error;
     }
 
     //check if the manger is valid
@@ -45,7 +45,7 @@ exports.post_register_user = async (req, res, next) => {
       if (_.isEmpty(valid_manager)) {
         var error = new Error("Invalid Manager. PLease enter a valid manager data");
         error.status = 400;
-        return next(error);
+        throw error;
       }
     } else {
       manager = null
@@ -66,9 +66,7 @@ exports.post_register_user = async (req, res, next) => {
       log_info.info({ success: true, token })
       return res.status(201).json({ success: true, token });
     } else {
-      var error = new Error("Nothing Inserted. Please try again later");
-      error.status = 500;
-      return next(error);
+      throw new Error("Nothing Inserted. Please try again later");
     }
   } catch (err) {
     next(err);
@@ -96,7 +94,7 @@ exports.post_login_user = async (req, res, next) => {
     }
     var error = new Error("Authentication Failed! Please check you email and password.");
     error.status = 401
-    return next(error)
+    throw error;
   } catch (err) {
     next(err);
   }
@@ -156,7 +154,7 @@ exports.update_user_profile = async (req, res, next) => {
       if (!_.isEmpty(userExists)) {
         var error = new Error("User already exists! Please try Logging in");
         error.status = 409;
-        return next(error);
+        throw error;
       }
     }
 

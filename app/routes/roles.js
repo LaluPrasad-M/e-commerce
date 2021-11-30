@@ -1,11 +1,11 @@
 const { check_authentication } = require("./middlewares/authorization");
+const { schema_validator } = require("./middlewares/schema_validation");
+
+const { create_role_schema } = require("../models/roles.model")
 const user_controller = require("../controller/roles");
 
 module.exports = (app) => {
-  app.post("/roles/", check_authentication, user_controller.postRoles);
+  app.post("/roles/", schema_validator(create_role_schema), user_controller.postRoles);
 
-  app.get("/roles/", check_authentication, user_controller.getRoles);
-  // app.get("/roles/:id", check_authentication, user_controller.getUserDetails);
-  // app.put("/roles/:id", check_authentication, user_controller.updateUsers);
-  // app.delete("/roles/:id", check_authentication, user_controller.deleteUser);
+  app.get("/roles/", user_controller.getRoles);
 };

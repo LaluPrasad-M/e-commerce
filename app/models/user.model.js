@@ -3,6 +3,7 @@ const moment = require("moment")
 
 require('yup-phone')
 
+//schema
 const name = Yup.string().required("Name is Required");
 const email = Yup.string().email("Please include a valid email").required("E-Mail is Required");
 const password = Yup.string().required("Password is Required").min(6, "Password must contain at-least six characters");
