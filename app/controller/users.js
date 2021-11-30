@@ -5,7 +5,6 @@ const db = require("../../config/mongo");
 const commonUtils = require("../utils/commonUtils");
 const collections = require("../../data/collections");
 const authentication = require("../utils/authentication");
-const { register_user_schema, login_user_schema, update_user_schema } = require("../models/user.model");
 
 const log_info = log4js.getLogger("info")
 
@@ -22,9 +21,7 @@ const log_info = log4js.getLogger("info")
 */
 exports.post_register_user = async (req, res, next) => {
   try {
-    var { phone, dob } = req.body;
-    //validate the request body data
-    var { name, email, password, role_code, manager } = await register_user_schema.validate(req.body)
+    var { name, email, password, role_code, manager, phone, dob } = req.body
 
     //check if a user already exists with the email
     let userExists = await db.getDb().db().collection(collections.users).findOne({ email });
@@ -86,7 +83,7 @@ exports.post_register_user = async (req, res, next) => {
 */
 exports.post_login_user = async (req, res, next) => {
   try {
-    let { email, password } = await login_user_schema.validate(req.body);
+    let { email, password } = req.body
     const user = await db.getDb().db().collection(collections.users).findOne({ email });
     if (!_.isEmpty(user)) {
       let { user_code, hashed_password } = user;
@@ -151,8 +148,7 @@ exports.get_user_profile = async (req, res, next) => {
 exports.update_user_profile = async (req, res, next) => {
   try {
     let user_code = req.user.user_code;
-    var { name, email, phone, dob } = await update_user_schema.validate(req.body)
-    let data = { name, email, phone, dob }
+    let data = { name, email, phone, dob } = req.body
 
     //check if a user already exists with the email
     if (req.user.email !== email) {
